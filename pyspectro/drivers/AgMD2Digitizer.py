@@ -147,6 +147,7 @@ def read_memory(instr, logicDevice, memoryBank, length):
 class AgMD2Device(Atom):
     """ Device driver for an FDK-Enabled AgMD2 device
     
+    This is the base class for the AgMD2Digitizer
     """
 
     #: resourceName : str
@@ -173,7 +174,7 @@ class AgMD2Device(Atom):
     #: the value is None.
     instrument = Typed(comtypes.IUnknown)  
     
-#     #: model :  IAgMD2Ex3
+#     #: model :  IAgMD2Ex3 (* Not currently used *)
 #     #:     An application utility (helper) model (use is optional)
 #     #: This object provides a model of device parameters that can be used
 #     #: by a higher-level application.  It includes local storage for device 
@@ -371,11 +372,6 @@ class KeysightDigitizer(AgMD2Device):
     #: interleaving Property 
     interleaving = Bool(True)
 
-    # @observe('interleaving')
-    # def _update_interleaving(self, change):
-    #     assert change['name'] == 'interleaving'
-    #     self._set_interleaving(change['value'])
-                 
     def _set_interleaving(self, val):
         if self.isConnected:
             #with self.lock:
@@ -431,52 +427,6 @@ class KeysightDigitizer(AgMD2Device):
         #: Sent start processing command to DSP core
         self.instrument.Acquisition.UserControl.StopProcessing(processingType)
 
-
-
-#     def applyFixedSettings(self):
-#         """ Apply settings that will never change
-#         
-#         """
-#         instr = self.instrument
-#         
-#         
-#         time.sleep(0.1)
-#         
-#         instr.Acquisition.ApplySetup() 
-#     
-# 
-#         #: Configure Channels
-#         assert (self.channel['Channel1'].Coupling == InputCoupling['DC'])
-#         assert (self.channel['Channel2'].Coupling == InputCoupling['DC'])
-# 
-#         assert (self.channel['Channel1'].InputImpedance == 50)
-#         assert (self.channel['Channel2'].InputImpedance == 50)
-# 
-#         instr.Acquisition.ApplySetup() 
-
-        
-    def info(self):
-        if self.isConnected:
-            print('Reading device information:')
-            print(' Identifier {0}'.format(self.instrument.Identity.Identifier))
-            print(' Revision {0}'.format(self.instrument.Identity.Revision))
-            print(' Vendor {0}'.format(self.instrument.Identity.Vendor))
-            print(' Description {0}'.format(self.instrument.Identity.Description))
-            print(' InstrumentModel {0}'.format(self.instrument.Identity.InstrumentModel))
-            print(' InstrumentFirmwareRevision {0}'.format(self.instrument.Identity.InstrumentFirmwareRevision))
-            print(' GroupCapabilities {0}'.format(self.instrument.Identity.GroupCapabilities))
-            print(' InstrumentManufacturer {0}'.format(self.instrument.Identity.InstrumentManufacturer))
-            print(' InstrumentModel {0}'.format(self.instrument.Identity.InstrumentModel))
-            print(' IoResourceDescriptor {0}'.format(self.instrument.DriverOperation.IoResourceDescriptor))
-            print(' BoardTemperature {0}'.format(self.instrument.Temperature.BoardTemperature))
-            print('Channels found:')
-            print(self.Channels)
-            print('LogicDevices found:')
-            print(self.LogicDevices)
-            print('Memory Banks found:')
-            print(self.MemoryBanks)
-
-    
                 
 class ConfigurationStore(Atom):
     """ Interface to the IVI configuration store
@@ -499,13 +449,3 @@ class ConfigurationStore(Atom):
         self._store = comtypes.client.CreateObject("IviConfigServer.IviConfigStore.1")
 
 
-"""
-        - Older Samples (or Channel 1) = Lower Half are written to DDRA
-        - Newer Samples (or Channel 2) = Upper Half are written to DDRB
-"""
-        
-if __name__ == '__main__':
-    
-    dig = KeysightDigitizer('PXI4::4-0.0::INSTR')
-    dig.connect()
-    dig.info()      

@@ -9,22 +9,8 @@
 #------------------------------------------------------------------------------
 from __future__ import (division, print_function, absolute_import)
 
-"""
-Description: Spectrometer Driver
-
-This module contains the python driver for the 
-1 GHz UHSFFTS Spectrometer with 16k channels.
-It may be used directly or referred to as a model
-for drivers written in other languages.   
-
-Copyright DSPlogic 2016
-
-"""
-              
-
 #: Package imports
-from atom.api import Int, Bool, Property, Float        
-import time    
+from atom.api import Atom, Int, Bool, Property, Float, Typed        
 import numpy as np
 from .dsplogic import BUFFER_ID
 from ..common.bitreversal import bitrevorder
@@ -58,6 +44,14 @@ REGISTER_MAP = {
 
 class Spectrometer(KeysightDigitizer):
     """ Spectrometer driver
+
+    This class implementes python driver for the DSPlogic's 
+    1 GHz Wideband FFT Spectrometer with 16k channels.
+    It may be used directly or referred to as a model
+    for drivers written in other languages.   
+    
+    It should be instantiated using the helper function
+    UHSFFTS_32k()
 
     Properties
     ----------
@@ -95,7 +89,7 @@ class Spectrometer(KeysightDigitizer):
     """
 
     #: FFT Length
-    Nfft = Int()
+    Nfft = property(lambda self: self._Nfft)
 
     #: Number of averages (R/W)
     numAverages = Property()
@@ -123,7 +117,7 @@ class Spectrometer(KeysightDigitizer):
     _float = Bool(False)
     
     #: Number of frequency bins (private)
-    _nFreqs = Int()
+    _Nfft = Int()
     
     #: Test mode for internal use
     _testMode   = Property()
@@ -137,14 +131,12 @@ class Spectrometer(KeysightDigitizer):
         """ Initialize spectrometer driver
         
         Delegate initialization to superclass (KeysightDigitizer)
-        Turn on interleaving
+        and turn on required interleaving
         """
 
         super(Spectrometer, self).__init__(resourceName=resourceName, **kwargs)
         
         self.interleaving = True
-        
-        self._nFreqs = self.Nfft//2
         
     def read_register(self, reg):
         """ Read control register
@@ -181,11 +173,14 @@ class Spectrometer(KeysightDigitizer):
             raise Exception('Invalid register %s' % reg)
 
     def read_memory(self, chan):
-        """ Read digitizer memory
+        """ Read (partial) measurement from digitizer memory
 
-        When channels are interleaved, processing results may be contained in
-        one or both channels. 
-        
+        This function reads measurement data from DDR memory.  Due to
+        interleaving, the data is split between channel 1 and channel 2.
+
+        The MemoryConverter class can be used to map the DDR memory contents
+        returned by this method into FFT bins in normal order 
+                
         Parameters
         ----------
         chan : int
@@ -199,9 +194,7 @@ class Spectrometer(KeysightDigitizer):
         
         """
 
-        #with self.lock:
-
-        nbrint32 = self._nFreqs//2
+        nbrint32 = self._Nfft//2//2
         
         if chan == 1:
             
@@ -232,12 +225,14 @@ class Spectrometer(KeysightDigitizer):
                     
         return result
 
-
+    """ Property getters and setters
+    """
     def _get_numAverages(self):
+        
         return self.read_register('num_average') + 1
 
     def _set_numAverages(self, val):
-        #with self.lock:
+        
         self.write_register('num_average', val-1)
     
     def _get_continuousMode(self):
@@ -248,8 +243,6 @@ class Spectrometer(KeysightDigitizer):
         
     def _set_continuousMode(self, val):
 
-        #with self.lock:
-        
         mcreg = self.read_register('main_control')
         
         if val:
@@ -267,8 +260,6 @@ class Spectrometer(KeysightDigitizer):
         
     def _set_disablePolyphase(self, val):
 
-        #with self.lock:
-        
         mcreg = self.read_register('main_control')
         
         if val:
@@ -286,8 +277,6 @@ class Spectrometer(KeysightDigitizer):
 
     def _set__testMode(self, val):
         
-        #with self.lock:
-            
         mcreg = self.read_register('_tg_control1')
         
         if val:
@@ -303,16 +292,11 @@ class Spectrometer(KeysightDigitizer):
         
         return self.__testFreq
         
-        #phst = self.read_register('_tg_control2')
-        #return float(phst) * 250000000.0/(2**24)
-        
     def _set__testFreq(self, f):
 
         if f > 1e9:
             raise Exception('Frequency must be less than 1 GHz')
 
-        #with self.lock:    
-                
         phst = int( float(f)/2e9 * (2**28))
         
         self.write_register('_tg_ph0',      0 * phst)
@@ -359,14 +343,68 @@ def UHSFFTS_32k(resourceName=''):
     
     bitfile = 'U5303ADPULX2FDK_uhsffts_32k_float_0_2_16.bit'
     
-    return Spectrometer(resourceName, bitfile=bitfile, _float=True, Nfft = 32768)
+    return Spectrometer(resourceName, bitfile=bitfile, _float=True, _Nfft = 32768)
          
 def UHSFFTS_32k_fxp(resourceName=''):
     
     bitfile = 'U5303ADPULX2FDK_uhsffts_32k_fixed_0_1_35.bit'
     
-    return Spectrometer(resourceName, bitfile, _float=False, Nfft = 32768)
+    return Spectrometer(resourceName, bitfile, _float=False, _Nfft = 32768)
+
+class MemoryConverter(Atom):
+    """ Convert DDR memory to FFT format 
+    
+    A processor that converts data from instrument memory format
+    into normal FFT format.
+    
+    The indices that map memory locations to FFT bins are pre-computed at initialization
+    to improve performance. 
+    
+    Use the process() method to perform the conversion
+    """
+    
+    Nfft = Int()
+    
+    #: Private storage
+    _bitrev_indices = Typed(np.ndarray)
+    _ddra_indices   = Typed(np.ndarray)
+    _ddrb_indices   = Typed(np.ndarray)
+    
+    def __init__(self, Nfft):
+        """ Initialize the memory converter
         
+        Parameters
+        ----------
+        
+        Nfft : int
+            FFT Length
+
+        """
+        self.Nfft = Nfft
+        
+        #: Pre-compute bit reversal indices
+        self._bitrev_indices =  bitrevorder(np.array(range(Nfft//2)))
+        
+        #: Precompute FFT channel index for each location in memory
+        self._ddra_indices = np.zeros(Nfft//2//2, dtype = np.int)
+        self._ddrb_indices = np.zeros(Nfft//2//2, dtype = np.int)
+        
+        for k in range(Nfft//2//2//8):
+            self._ddra_indices[k*8 : (k+1)*8] = self._bitrev_indices[ 2*k   *8 + np.arange(8)] 
+            self._ddrb_indices[k*8 : (k+1)*8] = self._bitrev_indices[(2*k+1)*8 + np.arange(8)]
+    
+    def process(self, data_ddra, data_ddrb):
+        """ Convert memory data to FFT format
+        
+        """
+        result = np.empty( (self.Nfft//2,), dtype=np.float64 )
+
+        #: Assign memory data to FFT bins        
+        result[self._ddra_indices] = data_ddra
+        result[self._ddrb_indices] = data_ddrb
+                
+        return result
+
 
 if __name__ == "__main__":
 
