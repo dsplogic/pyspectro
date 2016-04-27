@@ -13,57 +13,12 @@ from atom.api import Atom, Typed, Value, Callable, Float, Int, Str
 import threading
 import Queue
 import time
-import numpy as np
 
 import logging
 logger = logging.getLogger(__name__)
 
 
-from ..drivers.Spectrometer import Spectrometer
-from ..common.bitreversal import bitrevorder
-
-
-class MemoryConverter(Atom):
-    """ A processor that converts data from instrument memory format
-    onto normal FFT format.
-    """
-    
-    Nfft = Int()
-    
-    #: Private storage
-    _bitrev_indices = Typed(np.ndarray)
-    _ddra_indices   = Typed(np.ndarray)
-    _ddrb_indices   = Typed(np.ndarray)
-    
-    def __init__(self, Nfft):
-        """ Initialize the converter
-        
-        """
-        self.Nfft = Nfft
-        
-        #: Pre-compute bit reversal indices
-        self._bitrev_indices =  bitrevorder(np.array(range(Nfft//2)))
-        
-        #: Precompute FFT channel index for each location in memory
-        self._ddra_indices = np.zeros(Nfft//2//2, dtype = np.int)
-        self._ddrb_indices = np.zeros(Nfft//2//2, dtype = np.int)
-        
-        for k in range(Nfft//2//2//8):
-            self._ddra_indices[k*8 : (k+1)*8] = self._bitrev_indices[ 2*k   *8 + np.arange(8)] 
-            self._ddrb_indices[k*8 : (k+1)*8] = self._bitrev_indices[(2*k+1)*8 + np.arange(8)]
-    
-    def process(self, data_ddra, data_ddrb):
-        """ Convert memory data to FFT format
-        
-        """
-        result = np.empty( (self.Nfft//2,), dtype=np.float64 )
-
-        #: Assign memory data to FFT bins        
-        result[self._ddra_indices] = data_ddra
-        result[self._ddrb_indices] = data_ddrb
-                
-        return result
-
+from ..drivers.Spectrometer import Spectrometer, MemoryConverter
 
 class AcquisitionStats(Atom):
     """ Acquistion statistics
