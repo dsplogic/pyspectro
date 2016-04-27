@@ -1,0 +1,78 @@
+#------------------------------------------------------------------------------
+# Copyright (c) 2016, DSPlogic, Inc.  All Rights Reserved.  
+# 
+# RESTRICTED RIGHTS
+# Use of this software is permitted only with a software license agreement.
+#
+# Details of the software license agreement are in the file LICENSE.txt, 
+# distributed with this software.
+#------------------------------------------------------------------------------
+from __future__ import (division, print_function, absolute_import)
+
+
+from enaml.layout.api import vbox, hbox, grid,  spacer, DockLayout, HSplitLayout, VSplitLayout, TabLayout, InsertItem, align
+from enaml.widgets.api import MainWindow, Container, DockArea, DockItem, PushButton, Slider, \
+                              MenuBar, Menu, Action, \
+                              Html, Form, Label, Field, \
+                              ObjectCombo, CheckBox, MultilineField, \
+                              IPythonConsole, MPLCanvas, ToolBar, GroupBox, ComboBox, RadioButton, SpinBox
+from enaml.stdlib.fields import IntField, FloatField
+from atom.api import Atom, ContainerList, Unicode
+
+
+from .channel_view    import ChannelDockItem, ChannelWindow
+
+
+def cap_case(name):
+    return ' '.join(s.capitalize() for s in name.split('-'))
+
+            
+enamldef ExperimentalView(Container):
+    """ Unused
+    """
+    attr model
+    attr mainArea
+    PushButton : pb_refresh :
+        text = 'Refresh'
+        enabled << model.core_state == 'idle'
+        clicked ::
+            model.refreshProperties()
+            
+    PushButton: add_ch:
+        text = 'Add Channel'
+        enabled << model.core_state == 'idle'
+        clicked ::
+            channelModel = model.device.model.Channels.models['Channel1']
+            name = 'channel_1'
+            title = 'Channel 1'
+            #:item = ChannelDockItem(mainArea, name=name, title=title, channelModel = channelModel)
+            #op = InsertItem(item=name, target='spectrum_1')
+            #mainArea.update_layout(op)
+            item = ChannelWindow(mainArea, name=name, title=title, channelModel = channelModel)
+            item.show()
+
+enamldef CalibrationView(Container):
+    attr model
+
+    Form:
+        Label:
+            text = "Status:"
+        Label:
+            text << 'Calibration required'  if model.Calibration_IsRequired else 'OK'
+    
+    PushButton: 
+        text = 'Calibrate'
+        enabled << model.core_state == 'idle'
+        clicked ::
+            with model.core.device.lock:
+                model.core.device.instrument.Calibration.SelfCalibrate()
+
+enamldef ConsoleView(Container):
+    attr model
+    MultilineField :
+        text << model.console.text
+
+
+
+
+                        

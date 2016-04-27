@@ -1,0 +1,73 @@
+#------------------------------------------------------------------------------
+# Copyright (c) 2016, DSPlogic, Inc.  All Rights Reserved.  
+# 
+# RESTRICTED RIGHTS
+# Use of this software is permitted only with a software license agreement.
+#
+# Details of the software license agreement are in the file LICENSE.txt, 
+# distributed with this software.
+#------------------------------------------------------------------------------
+from __future__ import (division, print_function, absolute_import)
+
+
+from enaml.widgets.api import Container, Label, RadioButton, Form, SpinBox, CheckBox, Slider, GroupBox, ActionGroup, RadioButton
+
+from enaml.stdlib.fields import FloatField
+from enaml.stdlib.slider_transform import FloatTransform
+
+enamldef AcquisitionControlView(Container):
+    # Note: RadioButton widgets are exclusive amongst sibilings
+    attr model
+    
+    GroupBox :
+        title << "Acquisition Window"
+        title_align << 'left'
+    
+        Form:
+            Label:
+                text = "Duration (sec)"
+        
+            FloatField:
+                value <<  32768.0/2.0e9 * model.numAverages
+                converter = lambda x: ('%.3f' % x)
+                value ::
+                    model.numAverages = int(round(value * ( 2.0e9 / 32768.0 )))
+    
+            Label:
+                text = "Number of averages"
+                
+            SpinBox: sbox:
+                maximum = 3662109  #: 60 sec
+                minimum = 6103     #: 0.1 sec
+                single_step = 1000
+                value := model.numAverages
+                            
+            Label:
+                text = ''
+                
+            Slider:
+                FloatTransform:
+                    value << 32768.0/2.0e9 * model.numAverages
+                    minimum = 0.1
+                    maximum = 60.0
+                    precision = 200
+                    value ::
+                        model.numAverages = int(round(value * ( 2.0e9 / 32768.0 )))
+                    
+    GroupBox : 
+        title << "Algorithm"
+        title_align << 'left'
+    
+        RadioButton: 
+            text      = 'Polyphase Filter Bank'
+            checked << not(model.disablePolyphase)
+            clicked ::
+                model.disablePolyphase = False
+
+        RadioButton: 
+            text      = 'FFT'
+            clicked ::
+                model.disablePolyphase = True
+            
+
+                

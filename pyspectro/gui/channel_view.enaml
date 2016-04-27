@@ -1,0 +1,71 @@
+#------------------------------------------------------------------------------
+# Copyright (c) 2016, DSPlogic, Inc.  All Rights Reserved.  
+# 
+# RESTRICTED RIGHTS
+# Use of this software is permitted only with a software license agreement.
+#
+# Details of the software license agreement are in the file LICENSE.txt, 
+# distributed with this software.
+#------------------------------------------------------------------------------
+from __future__ import (division, print_function, absolute_import)
+
+from enaml.layout.api import vbox
+
+from enaml.widgets.api import MainWindow, Window, Container, DockArea, DockItem, PushButton, Slider, \
+                              MenuBar, Menu, Action, \
+                              Html, Form, Label, Field, \
+                              ObjectCombo, CheckBox, MultilineField, \
+                              IPythonConsole, MPLCanvas, ToolBar, GroupBox, ComboBox, RadioButton, SpinBox, DockPane
+
+from enaml.stdlib.fields import IntField, FloatField
+
+from .autoform import AutoForm
+
+from pyspectro.applib.AgMD2models import IAgMD2Channel
+
+enamldef ChannelView(Container):
+    Container:
+        GroupBox:
+            title = 'Channel model'
+            flat = True
+            AutoForm:
+                padding = 0
+                model = channelModel    
+
+
+enamldef ChannelWindow(Window):
+
+    attr channelModel : IAgMD2Channel
+
+    
+    name = 'channelview'
+    title = 'Channel'
+    ChannelView:
+        pass
+
+
+enamldef ChannelDockItem(DockItem):
+
+    attr channelModel  #: IAgMD2Channel
+    
+    name = 'channelview'
+    title = 'Channel'
+    ChannelView:
+        pass
+
+
+
+enamldef PsDockPane(DockPane):
+    #:title << 'Dock Area %s | %s' % (dock_area, 'floating' if floating else 'docked')
+    closable = False
+    floatable = False
+    Container:
+        PushButton:
+            text = 'Foo'
+        PushButton:
+            text = 'Bar'
+        PushButton:
+            text = 'Baz'
+
+
+

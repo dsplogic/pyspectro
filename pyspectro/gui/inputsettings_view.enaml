@@ -1,0 +1,70 @@
+#------------------------------------------------------------------------------
+# Copyright (c) 2016, DSPlogic, Inc.  All Rights Reserved.  
+# 
+# RESTRICTED RIGHTS
+# Use of this software is permitted only with a software license agreement.
+#
+# Details of the software license agreement are in the file LICENSE.txt, 
+# distributed with this software.
+#------------------------------------------------------------------------------
+from __future__ import (division, print_function, absolute_import)
+
+
+from enaml.widgets.api import Container, Label, Form, Field, PushButton, CheckBox, ObjectCombo
+from enaml.widgets.api import GroupBox
+from enaml.stdlib.fields import FloatField
+from enaml.layout.api import horizontal, spacer
+
+
+enamldef InputSettingsView(Container): isview :
+    attr model
+    
+    attr changed : bool = False
+    
+    Form:
+
+        Label: fsr:
+            text = 'Full Scale Range (Volts)'
+        
+        ObjectCombo: style_c:
+            items = [1.0, 2.0]
+            selected := model.inputSettings.voltageRange
+            selected ::
+                isview.changed = True
+
+        Label:
+            text = 'Offset Adjustment (Volts)'
+        
+        FloatField:
+            value := model.inputSettings.voltageOffset
+            
+            minimum << -2.0 #* fsr.selected
+            maximum <<  2.0 #* fsr.selected
+            
+            value ::
+                isview.changed = True
+
+            # value ::
+            #     with model.core.device.lock:
+            #         model.core.device.instrument.Channels['Channel1'].Offset = value
+            #         model.core.device.instrument.Channels['Channel2'].Offset = value
+        
+        CheckBox: cont:
+            text      = 'Enable Filter'
+            checked  << not(model.inputSettings.FilterBypass)
+            toggled::
+                isview.changed = True
+                model.inputSettings.FilterBypass = not(checked)
+
+        Label:
+            text = ''
+
+        PushButton: 
+            text = 'Apply'
+            enabled << (model.core_state == 'idle') and changed
+            clicked ::
+                model.applyProperties()
+                model.refreshProperties()
+                isview.changed = False
+                
+                

@@ -1,0 +1,39 @@
+#------------------------------------------------------------------------------
+# Copyright (c) 2016, DSPlogic, Inc.  All Rights Reserved.  
+# 
+# RESTRICTED RIGHTS
+# Use of this software is permitted only with a software license agreement.
+#
+# Details of the software license agreement are in the file LICENSE.txt, 
+# distributed with this software.
+#------------------------------------------------------------------------------
+from __future__ import (division, print_function, absolute_import)
+
+
+from enaml.widgets.api import  StatusBar, StatusItem, Label, Action, ToolButton
+from .icons import connectedIcon
+
+enamldef PsStatusBar(StatusBar):
+
+    attr model 
+    
+
+    StatusItem:
+        mode = 'permanent'
+        Label:
+            text << model.core_state.title()
+
+    StatusItem:
+        mode = 'permanent'
+        ToolButton : 
+            icon = connectedIcon()
+            enabled << (model.core_state in ('idle'))
+
+    StatusItem:
+        Label:
+            text = "Status"
+            
+    #: Acquisition stats    
+    #StatusItem:
+    #    Label:
+    #        text << 'Acquisition {0:>3}   Measurement count: {1:>4}  Dropped: {2:>4}'.format(model.nAcquisitions, model.nMeasurements, model.nDropped)

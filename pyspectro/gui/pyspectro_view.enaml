@@ -1,0 +1,74 @@
+#------------------------------------------------------------------------------
+# Copyright (c) 2016, DSPlogic, Inc.  All Rights Reserved.  
+# 
+# RESTRICTED RIGHTS
+# Use of this software is permitted only with a software license agreement.
+#
+# Details of the software license agreement are in the file LICENSE.txt, 
+# distributed with this software.
+#------------------------------------------------------------------------------
+from __future__ import (division, print_function, absolute_import)
+
+from enaml.widgets.api import MainWindow, Container
+from enaml.stdlib.message_box import information
+
+from .ps_menubar      import PsMenuBar
+from .ps_toolbar      import PsToolBar
+from .ps_statusbar    import PsStatusBar
+from .acq_toolbar     import AcquisitionToolBar
+from .ps_dock_area    import PsDockArea
+from .pyspectro_model import SpectroModel
+from .icons import dsplogicIcon
+
+import logging
+logger = logging.getLogger(__name__)
+
+enamldef Main(MainWindow): main:
+
+    icon = dsplogicIcon()
+    
+    initial_size = (1024, 810)
+    
+    title = 'DSPlogic FFT Spectrometer'
+    
+    attr spectroModel = SpectroModel()
+    
+    closing ::
+        if spectroModel.core_state in ['idle','disconnected']:
+            spectroModel.disconnect()
+        else:
+            information(None, 'Info Dialog', 'Please stop acquisition before closing.')
+            event = change['value']  #: Get event payload
+            event.ignore()
+            
+    initialized ::
+        logger.info('Welcome to the DSPlogic Wideband FFT Spectrometer Application')
+    
+    PsMenuBar:
+        model = main.spectroModel
+        mainArea = mainArea
+    
+    PsStatusBar:
+        model = main.spectroModel
+    
+    AcquisitionToolBar:
+        model = main.spectroModel
+    
+    PsToolBar: connectBar :
+        model = main.spectroModel
+    
+        pass
+    
+    Container: content:
+    
+        attr stored = None
+        
+        padding = (0, 0, 0, 10)
+            
+        PsDockArea: mainArea:
+            spectroModel = main.spectroModel
+            style = 'metro'
+            pass
+        
+        
+        

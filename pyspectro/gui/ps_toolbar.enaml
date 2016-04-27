@@ -1,0 +1,60 @@
+#------------------------------------------------------------------------------
+# Copyright (c) 2016, DSPlogic, Inc.  All Rights Reserved.  
+# 
+# RESTRICTED RIGHTS
+# Use of this software is permitted only with a software license agreement.
+#
+# Details of the software license agreement are in the file LICENSE.txt, 
+# distributed with this software.
+#------------------------------------------------------------------------------
+from __future__ import (division, print_function, absolute_import)
+
+from enaml.widgets.api import  ToolBar,  Action, ActionGroup, Menu, PopupView
+
+from enaml.widgets.api import  Form, Field, PushButton, Label, Slider, ComboBox, SpinBox, Container, ObjectCombo
+from enaml.layout.api import spacer
+
+from enaml.icon import Icon, IconImage
+from enaml.image import Image
+
+from .icons import connectedIcon
+from enaml.core.api import Include
+            
+            
+enamldef PsToolBar(ToolBar):
+ 
+    attr model
+
+    constraints = [
+        #horizontal(left, pb1, resourceId, spacer.flex(), act1, spacer.flex(), right)
+        hbox([connectButton, resourceId, spacer, sep ]) ,
+    ]
+    
+    # Action : connectedicon :
+    #     icon = connectedIcon()
+    #     enabled << connectButton.checked
+    Label:
+        text = 'Instrument  '
+        
+        
+    Field: resourceId:
+        placeholder = 'Resource ID'
+        text := model.resourceName
+        constraints = [width == 25]
+
+    Action: connectButton:
+        text = 'Connect'
+        enabled << model.core_state == 'disconnected' 
+        triggered ::
+            model.connect()
+
+    Action: disConnectButton:
+        text = 'Disconnect'
+        enabled << model.core_state == 'idle'
+        triggered ::
+            model.disconnect()
+
+    Action: sep :
+        separator = True
+
+                            

@@ -1,0 +1,82 @@
+#------------------------------------------------------------------------------
+# Copyright (c) 2016, DSPlogic, Inc.  All Rights Reserved.  
+# 
+# RESTRICTED RIGHTS
+# Use of this software is permitted only with a software license agreement.
+#
+# Details of the software license agreement are in the file LICENSE.txt, 
+# distributed with this software.
+#------------------------------------------------------------------------------
+from __future__ import (division, print_function, absolute_import)
+
+
+
+from enaml.widgets.api import Container, Label, Form, Field
+from enaml.widgets.api import GroupBox
+from enaml.stdlib.fields import FloatField
+from enaml.layout.api import horizontal, spacer
+
+
+enamldef MonitorView(Container):
+    attr model
+    
+    constraints = [ horizontal(grp_acq, spacer.flex(), grp_env, spacer.flex(), grp_cal)
+    ]
+
+    GroupBox: grp_acq:
+        title << "Acquisition"
+        title_align << 'left'
+        Form:
+            Label:
+                text = "# Acquisitions:"
+            Label:
+                text << unicode(model.nAcquisitions)
+            Label:
+                text = "# Measurements:"
+            Label:
+                text << unicode(model.nMeasurements)
+            Label:
+                text = "Dropped:"
+            Label:
+                text << unicode(model.nDropped)
+    
+    GroupBox: grp_env:
+        title << "Temperature (deg C)"
+        title_align << 'left'
+        Form:
+            Label:
+                text = "Board (Max 85):"
+            Label:
+                text << '{0:>5.2f}'.format(model.temperatures.temp_board_c)
+            Label:
+                text = "ADC (Max 100):"
+            Label:
+                text << '{0:>5.2f}'.format(model.temperatures.temp_adc_c)
+                
+            #: The following system temperatures are redundant
+            # Label:
+            #     text = "Channel 1"
+            # Label:
+            #     text << '{0:>5.2f}'.format(model.temperatures.temp_ch1_c)
+            # Label:
+            #     text = "Channel 2"
+            # Label:
+            #     text << '{0:>5.2f}'.format(model.temperatures.temp_ch2_c)
+            # Label:
+            #     text = "DPUA"
+            # Label:
+            #     text << '{0:>5.2f}'.format(model.temperatures.temp_dpu_c)
+                
+                
+
+    GroupBox: grp_cal:
+        title << "Calibration"
+        title_align << 'left'
+        Form:
+            Label:
+                text = "Status:"
+            Label:
+                text << 'Calibration required'  if model.Calibration_IsRequired else 'OK'
+
+
+

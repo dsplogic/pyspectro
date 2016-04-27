@@ -1,0 +1,64 @@
+#------------------------------------------------------------------------------
+# Copyright (c) 2016, DSPlogic, Inc.  All Rights Reserved.  
+# 
+# RESTRICTED RIGHTS
+# Use of this software is permitted only with a software license agreement.
+#
+# Details of the software license agreement are in the file LICENSE.txt, 
+# distributed with this software.
+#------------------------------------------------------------------------------
+from __future__ import (division, print_function, absolute_import)
+
+
+from enaml.widgets.api import  MenuBar, Menu, Action, ActionGroup, Window
+
+from .instrument_info_view import InstrumentInfoView
+
+import time
+
+enamldef PsMenuBar(MenuBar): 
+    attr model
+    attr mainArea
+    
+    Menu:
+        title = '&File'
+        Action:
+            text = 'Connect\tCtrl+T'
+            enabled << model.core_state == 'disconnected' 
+            triggered ::
+                model.connect()
+
+            
+        Action:
+            text = 'Disconnect\tCtrl+D'
+            enabled << model.core_state == 'idle'
+            triggered ::
+                model.disconnect()
+                 
+    Menu:
+        title = '&View'
+        Action:
+            text = 'Instrument Info\tCtrl+I'
+            enabled << model.core_state == 'idle'
+            triggered :: 
+                win = Window()
+                win.title = 'Instrument Info'
+                infoview = InstrumentInfoView(instrumentInfoModel = model.instrumentProperties )
+                infoview.set_parent(win)
+                win.show()
+            
+                print 'Instrument info'
+
+
+    Menu:
+        title = '&Window'
+        
+        Action:
+            text = 'Reset window layout'
+            enabled << model.core_state == 'idle'
+            triggered ::
+                mainArea.controller.close_dock_layout()
+                time.sleep(0.1)
+                mainArea.controller.initialize_layout()
+                
+

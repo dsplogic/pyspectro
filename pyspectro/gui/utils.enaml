@@ -1,0 +1,48 @@
+#------------------------------------------------------------------------------
+# Copyright (c) 2016, DSPlogic, Inc.  All Rights Reserved.  
+# 
+# RESTRICTED RIGHTS
+# Use of this software is permitted only with a software license agreement.
+#
+# Details of the software license agreement are in the file LICENSE.txt, 
+# distributed with this software.
+#------------------------------------------------------------------------------
+from __future__ import (division, print_function, absolute_import)
+
+
+from enaml.layout.api import hbox, vbox, align, spacer
+from enaml.widgets.api import (
+    Window, Container, Label, Field, SpinBox, PushButton,
+)
+from enaml.core.api import Include
+
+class VContainer(Container):
+    """ A simple expanding vertical container.
+
+    This container will always layout its children using a vbox with a
+    spacer as the last element. User-defined constraints are ignored.
+
+    """
+    def layout_constraints(self):
+        """ Generate the list of constraints for the container.
+
+        """
+        items = self.widgets()
+        items.append(spacer(0))
+        return [vbox(*items)]
+    
+class HContainer(Container):
+    """ A simple expanding vertical container.
+
+    This container will always layout its children using a hbox with a
+    spacer as the last element. User-defined constraints are ignored.
+
+    """
+    def layout_constraints(self):
+        """ Generate the list of constraints for the container.
+
+        """
+        items = self.widgets()
+        items.append(spacer(0))
+        return [hbox(*items)]
+

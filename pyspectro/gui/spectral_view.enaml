@@ -1,0 +1,111 @@
+#------------------------------------------------------------------------------
+# Copyright (c) 2016, DSPlogic, Inc.  All Rights Reserved.  
+# 
+# RESTRICTED RIGHTS
+# Use of this software is permitted only with a software license agreement.
+#
+# Details of the software license agreement are in the file LICENSE.txt, 
+# distributed with this software.
+#------------------------------------------------------------------------------
+from __future__ import (division, print_function, absolute_import)
+
+
+from enaml.layout.api import vbox, hbox, align
+from enaml.widgets.api import Container, CheckBox, Label, MPLCanvas
+
+#from .mpl_figure import SpectrumFigure
+
+import functools
+import numpy as np
+from enaml.widgets.combo_box import ComboBox
+
+
+
+def update_label(specView, event):
+
+    #: Event indices
+    ind = event.ind
+
+    # the click locations
+    x = event.mouseevent.xdata
+    y = event.mouseevent.ydata
+
+    #: Get data
+    thisline = event.artist
+    xdata = thisline.get_xdata()
+    ydata = thisline.get_ydata()
+    points = zip(xdata[ind], ydata[ind])
+
+    #: Find closest point
+    distances = np.hypot(x - xdata[ind], y - ydata[ind])
+    indmin = distances.argmin()
+    dataind = event.ind[indmin]
+    closestPoint = (xdata[dataind], ydata[dataind])
+
+    specView.specModel.ind_selected = dataind
+    specView.specModel.selection_active = True
+
+    #: Update label
+    #label = specView.find('picker_label')
+    #label.text = "(%s, %s)" % closestPoint 
+    
+    specView.specModel.redraw()
+                    
+                    
+enamldef SpectralView(Container):  specView :
+
+    attr specModel
+    
+    activated ::
+        specModel.figure.canvas.mpl_connect('pick_event', 
+                               functools.partial(update_label, self))
+
+        canvas.toolbar_visible = True
+        specModel.autoscale = False
+        
+
+    constraints = [
+        vbox(     hbox(chk_tb, autoscale, units), canvas, picker ),
+        align('width', chk_tb, autoscale, units)
+    ]
+    
+    MPLCanvas: canvas:
+        figure << specModel.figure
+
+    CheckBox: chk_tb:
+        text = 'Show Toolbar'
+        checked := canvas.toolbar_visible
+
+    ComboBox: units:
+        items = ['dB-FS', 'FS', 'dBm'] #, 'mW'
+        index  << items.index(specModel.units)
+        selected_item >> specModel.units
+        selected_item ::
+            if selected_item == 'dB-FS':
+                specModel.yrange = (-120, 0)
+                specModel.autoscale = False
+                specModel.update_ylabel()
+            elif selected_item == 'FS':
+                specModel.yrange = (0, 1)
+                specModel.autoscale = False
+                specModel.update_ylabel()
+            elif selected_item == 'dBm':
+                specModel.yrange = (-110, 10)
+                specModel.autoscale = False
+                specModel.update_ylabel()
+
+    CheckBox: autoscale:
+        text = 'Auto Scale'
+        checked := specModel.autoscale
+        toggled ::
+            if checked:
+                specModel.ax.autoscale(enable=True, axis='both')
+            else:
+                specModel.ax.autoscale(enable=False, axis='both')
+    
+            
+    Label: picker :
+        name = 'picker_label'
+        #enabled << specModel.selection_active
+        text << 'Selected: {0} MHz, {1:g} {2}'.format(specModel.val_selected[0], specModel.val_selected[1], specModel.units) #if enabled else ''
+        

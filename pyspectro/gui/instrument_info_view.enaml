@@ -1,0 +1,79 @@
+#------------------------------------------------------------------------------
+# Copyright (c) 2016, DSPlogic, Inc.  All Rights Reserved.  
+# 
+# RESTRICTED RIGHTS
+# Use of this software is permitted only with a software license agreement.
+#
+# Details of the software license agreement are in the file LICENSE.txt, 
+# distributed with this software.
+#------------------------------------------------------------------------------
+from __future__ import (division, print_function, absolute_import)
+
+
+from enaml.widgets.api import Container, Label, Form, Field, Window
+from enaml.widgets.api import GroupBox
+from enaml.stdlib.fields import FloatField
+from enaml.layout.api import horizontal, spacer
+
+
+enamldef InstrumentInfoView(Container):
+    
+    attr instrumentInfoModel 
+    
+
+    GroupBox: grp_instrument:
+        title << "Instrument"
+        title_align << 'left'
+        Form:
+            Label:
+                text = "Resource Descriptor:"
+            Label:
+                text = "{0}".format(unicode(instrumentInfoModel.Driver_IoResourceDescriptor))
+            Label:
+                text = "Model:"
+            Label:
+                text << unicode(instrumentInfoModel.Instrument_Model)
+
+            Label:
+                text = "Serial number:"
+            Label:
+                text << unicode(instrumentInfoModel.Instrument_SerialNumberString)
+
+            Label:
+                text = "Options:"
+            Label:
+                text << unicode(instrumentInfoModel.Instrument_Options)
+
+            Label:
+                text = "Firmware Revision:"
+            Label:
+                text << unicode(instrumentInfoModel.Instrument_FirmwareRevision)
+
+            Label:
+                text = "IO Version:"
+            Label:
+                text << unicode(instrumentInfoModel.Instrument_IOVersion)
+
+    GroupBox: grp_driver:
+        title << "Driver"
+        title_align << 'left'
+        Form:
+            Label:
+                text = "Driver ID:"
+            Label:
+                text << unicode(instrumentInfoModel.Driver_Identifier)
+            Label:
+                text = "Driver Revision:"
+            Label:
+                text << unicode(instrumentInfoModel.Driver_Revision)
+
+
+enamldef InstrumentInfoWindow(Window):
+ 
+    attr instrumentInfoModel
+ 
+    InstrumentInfoView :
+    
+        instrumentInfoModel = instrumentInfoModel
+
+    

@@ -1,0 +1,24 @@
+Copyright (c) 2016, DSPlogic, Inc.
+All rights reserved
+
+PySpectro Software License Agreement
+
+This software license Agreement is a legal agreement between you and DSPlogic, Inc.  By using the Software, you (either an individual or entity) agree to be bound by the terms of this Agreement.  So long as you comply with the terms of this Agreement, DSPlogic grants to you the perpetual, non-assignable, non-transferable and non-exclusive right to use and modify the Software subject to the following limitations:
+
+  1. Software may be used or modified solely for the purposes of interacting with products sold by DSPlogic, Inc.
+  
+  2. You may not redistribute, sublicense, lend, lease, assign, or transfer the Software is not permitted without express written consent of DSPlogic, Inc.
+  
+  3. Except for the limited license granted herein, DSPlogic shall at all times retain full and exclusive right, title and ownership interest in and to the Software, including, without limitation, all patent, trademark, copyright, trade secret rights.  
+  
+  4. DSPlogic reserves the right to terminate your rights under this Agreement and to seek any other legal remedies if you violate any provisions hereof.  
+  
+  5. The export or re-export of United States original software and documentation is subject to the Export Administration Act of 1969 as amended. Compliance with such regulations is your responsibility. You agree you intend to or will, directly or indirectly, export or transmit the Software or related documentation or technical data to any country to which such export or transmission is restricted by any applicable United States regulation or statute, without the proper written consent, if required of the Bureau of Export Administration of the United States Department of Commerce, or such other governmental entity as may have jurisdiction over such export or transmission.
+
+  6. You agree to submit to exclusive jurisdiction in the federal and state courts of Maryland, U.S.A. in the event of a dispute. This Agreement shall be interpreted pursuant to Maryland law without regard to principles of conflicts of laws.
+
+  7. Modifications of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+
+    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+    

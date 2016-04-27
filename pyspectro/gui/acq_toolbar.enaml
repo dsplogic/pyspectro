@@ -1,0 +1,54 @@
+#------------------------------------------------------------------------------
+# Copyright (c) 2016, DSPlogic, Inc.  All Rights Reserved.  
+# 
+# RESTRICTED RIGHTS
+# Use of this software is permitted only with a software license agreement.
+#
+# Details of the software license agreement are in the file LICENSE.txt, 
+# distributed with this software.
+#------------------------------------------------------------------------------
+from __future__ import (division, print_function, absolute_import)
+
+
+from atom.api import Atom
+from enaml.widgets.api import  ToolBar,  Action, ActionGroup
+
+from enaml.widgets.api import  Form, Field, PushButton, Label, CheckBox
+from enaml.layout.api import spacer, hbox
+
+
+enamldef AcquisitionToolBar(ToolBar):
+
+    attr model 
+
+    constraints = [
+        hbox(lbl, start, stop, sep, cont)
+    ]
+    
+    Action: start:
+        text = 'Start'
+        enabled << model.core_state == 'idle'
+        triggered ::
+            model.startAcquisition()
+
+    Action: stop:
+        text = 'Stop'
+        #enabled << model.core_state not in ('disconnected','connecting' 'idle')
+        enabled << model.core_state == 'acquiring'
+        triggered ::
+            model.stopAcquisition()
+        
+    Action: sep:
+        separator = True
+
+    CheckBox: cont:
+        text      = 'Continuous'
+        
+        #checkable << model.core_state == 'idle'
+        
+        toggled ::
+            model.setContinuousMode(checked)
+        
+        
+        
+                

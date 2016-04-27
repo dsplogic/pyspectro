@@ -1,0 +1,73 @@
+#------------------------------------------------------------------------------
+# Copyright (c) 2016, DSPlogic, Inc.  All Rights Reserved.  
+# 
+# RESTRICTED RIGHTS
+# Use of this software is permitted only with a software license agreement.
+#
+# Details of the software license agreement are in the file LICENSE.txt, 
+# distributed with this software.
+#------------------------------------------------------------------------------
+from __future__ import (division, print_function, absolute_import)
+
+
+
+from enaml.widgets.api import Container, Form
+from enaml.widgets.api import CheckBox
+from enaml.widgets.api import Label
+from enaml.widgets.api import Slider
+from enaml.widgets.api import SpinBox
+from enaml.widgets.timer import Timer
+from enaml.stdlib.fields import FloatField
+from enaml.stdlib.slider_transform import FloatTransform
+
+from pyspectro.gui.cwtest_model import CwTestModel
+ 
+enamldef CwTestView(Container):
+
+    attr cwTestModel : CwTestModel
+    attr f_center : float = 50000000.0
+    attr f_offset : int = 0
+    attr f_actual : float = 0.0
+
+    CheckBox: cont:
+        text      = 'Enable test input'
+        toggled ::
+            if checked:
+                cwTestModel.applyTestFreq(f_center + f_offset)
+            cwTestModel.testMode = checked
+            
+    # FloatField:
+    #     value :=  cwTestModel.testFreq
+    #     converter = lambda x: ('%g' % x)
+
+    Form:
+        Label:
+            text = 'Center Frequency (Hz)'
+            
+        FloatField :
+            value := f_center
+            value :: timer.start()
+            minimum = 0.0
+            maximum = float(1e9)
+            
+        Label:
+            text = 'Offset (Hz)'
+    
+        SpinBox: sbox:
+            maximum = 100000
+            minimum = -100000
+            single_step = 1000
+            value := f_offset
+            value :: timer.start()
+            hug_width = 'strong'
+        
+
+    #value :: timer.start()
+    Timer: timer:
+        interval = 350
+        single_shot = True
+        timeout :: 
+            cwTestModel.applyTestFreq(f_center + f_offset)
+
+            
+            
