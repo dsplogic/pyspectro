@@ -1,1 +1,1 @@
-# pyspectro
+# PySpectro
