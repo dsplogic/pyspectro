@@ -42,12 +42,12 @@ class Test(unittest.TestCase):
         
         self.cm.connect()
         
-        print('Waiting for connection')
+        logger.info('Waiting for connection')
         self.cm.connected.wait()
         
         self.cm.disconnect()
 
-        print('Waiting for disconnect')
+        logger.info('Waiting for disconnect')
         self.cm.disconnected.wait()
         
         self.cm.terminate()
