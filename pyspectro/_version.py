@@ -12,10 +12,10 @@ from __future__ import (division, print_function, absolute_import)
 try :
     from _version_build import _buildid    
 except:
-    _buildid = 'dev'
+    _buildid = '0'
 
-_major = 0
-_minor = 1
+_major = 1
+_minor = 0
 
 __version__ = '%s.%s.%s' % (_major,_minor,_buildid)    
 
