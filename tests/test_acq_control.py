@@ -84,6 +84,7 @@ class Test(unittest.TestCase):
         self.Fs = self.ffts.instrument.Acquisition.SampleRate
 
     def tearDown(self):
+        
         self.acqControl.terminate()
         self.ffts.disconnect()
 

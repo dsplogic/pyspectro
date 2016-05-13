@@ -150,7 +150,8 @@ class Spectrometer(KeysightDigitizer):
         
         if reg in REGISTER_MAP.iterkeys():
             reg_addr = REGISTER_MAP[reg]
-            return self.logicDevice['DpuA'].ReadRegisterInt32(reg_addr)
+            reg = self.logicDevice['DpuA'].ReadRegisterInt32(reg_addr)
+            return reg
         else:
             raise Exception('Invalid register %s' % reg)
     
@@ -341,16 +342,11 @@ class Spectrometer(KeysightDigitizer):
 """
 def UHSFFTS_32k(resourceName=''):
     
-    bitfile = 'U5303ADPULX2FDK_uhsffts_32k_float_0_2_16.bit'
+    bitfile = 'U5303ADPULX2FDK_uhsffts_32k_float_1_0_229.bit'
     
     return Spectrometer(resourceName, bitfile=bitfile, _float=True, _Nfft = 32768)
-         
-def UHSFFTS_32k_fxp(resourceName=''):
-    
-    bitfile = 'U5303ADPULX2FDK_uhsffts_32k_fixed_0_1_35.bit'
-    
-    return Spectrometer(resourceName, bitfile, _float=False, _Nfft = 32768)
 
+         
 class MemoryConverter(Atom):
     """ Convert DDR memory to FFT format 
     
