@@ -35,12 +35,13 @@ setup(
     version=get_version(),
     description='DSPlogic Wideband FFT Spectrometer GUI',
     long_description=read('README.md'),
+    package_data={'': ['*.enaml', 'gui/icons/*.png']},
     packages=find_packages(exclude=['test', 'examples']),
     keywords='spectrometer, fft',
     author='DSPlogic, Inc.',
     author_email='inforequest@dsplogic.com',
     url='http://www.dsplogic.com',
     license='Licensed with restricted rights.  See LICENSE.txt for details',
-    entry_points={'console_scripts': ['run-pyspectro = run_pyspectro:main']}
+    entry_points={'console_scripts': ['run-pyspectro = pyspectro.__main__:main']}
     #ext_modules=ext_modules,
 )
