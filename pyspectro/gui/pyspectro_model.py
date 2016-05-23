@@ -264,19 +264,24 @@ class SpectroModel(Atom):
         
         elif newval == 'disconnected':
             
-            #: This change should occur as the result of a sucessfull call
-            #: to core.disconnect.  There is no need to wait for 
-            #: core.disconnect_event.
-
-            #: Signal GUI to open windows
-            self.connectionSignal(False)
+            if change['oldvalue'] == 'idle':
             
-            self.core = None
+                #: This change should occur as the result of a sucessfull call
+                #: to core.disconnect.  There is no need to wait for 
+                #: core.disconnect_event.
 
-            self.cwTestModel = None
-            
-            self.refresh_timer.stop()
-            self.refresh_timer = None
+                #: Signal GUI to close windows
+                self.connectionSignal(False)
+                
+                self.core = None
+                self.cwTestModel = None
+                
+                self.refresh_timer.stop()
+                self.refresh_timer = None
+                
+            elif change['oldvalue'] == 'connecting':
+                #: result of a failed connection
+                pass
 
         
         elif newval == 'idle':

@@ -36,6 +36,7 @@ class ConnectionManager(CommandThread):
 
     connected    = Typed(threading._Event, ())
     disconnected = Typed(threading._Event, ())
+    failed       = Typed(threading._Event, ())
 
     connectionState = property(lambda self: self._state)
     
@@ -123,6 +124,7 @@ class ConnectionManager(CommandThread):
                     self._state = 'connected'
                     self.status.put('connected')
                 else:
+                    self.failed.set()
                     self._state = 'failed'
                     self.status.put('failed')
                 
