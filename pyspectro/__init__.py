@@ -14,7 +14,7 @@ __title__     = 'pyspectro'
 __license__   = 'Licensed with restricted rights.  See LICENSE.txt for details'
 __copyright__ = 'Copyright (c) 2016, DSPlogic, Inc.  All Rights Reserved'
 
-from _version import __version__
+from ._version import __version__
 
 import sys
 if sys.version_info[:2] < (2, 7):
