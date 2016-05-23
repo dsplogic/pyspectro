@@ -2,3 +2,6 @@
 .pydevproject
 *.pyc
 *__enamlcache__
+build
+dist
+pyspectro.egg*
