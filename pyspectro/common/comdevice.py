@@ -27,10 +27,12 @@ import comtypes
 try:
     from comtypes.gen import AgMD2Lib
 except:
-    import comtypes.client
-    comtypes.client.CreateObject("AgMD2.AgMD2")
-    from comtypes.gen import AgMD2Lib
-    
+    try: # The following may fail if a device driver is not installed.
+        import comtypes.client
+        comtypes.client.CreateObject("AgMD2.AgMD2")
+        from comtypes.gen import AgMD2Lib
+    except:
+        pass
 
 logger = logging.getLogger(__name__)
 

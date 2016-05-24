@@ -193,7 +193,11 @@ class PySpectroCore(CommandThread):
                     with self.device.lock:
                         result = get_instrument_properties_string(self.device)
                     logger.info(result)
-
+                
+                #: If connection fails, state will return to disconnected
+                if self._con.failed.is_set():
+                    self._con.failed.clear()
+                    self._state = 'disconnected'
                      
             elif self._state == 'idle':
                 

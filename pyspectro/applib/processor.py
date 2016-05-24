@@ -17,7 +17,7 @@ from atom.api import Atom, Typed, Value, Callable, Tuple, Dict, List, Float
 import logging
 logger = logging.getLogger(__name__)
     
-from queue import Queue
+from Queue import Queue
 
 
 class ProcessTask(Atom):
