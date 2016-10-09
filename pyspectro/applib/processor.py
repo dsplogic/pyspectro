@@ -95,7 +95,11 @@ class ProcessTask(Atom):
 
 
 class CommandThread(Atom):
-    """ Simple thread that accepts commands
+    """ A simple thread that accepts commands
+    
+    This class is intended to be sub-classed with
+    a re-implemented self._main_loop method containing
+    the thread functionality
     
     """
     #: Private storage for worker thread

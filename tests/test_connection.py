@@ -13,6 +13,7 @@ import unittest
 
 from pyspectro.drivers.Spectrometer import UHSFFTS_32k
 from pyspectro.applib.connection import ConnectionManager
+from pyspectro.applib.instrument_props import get_instrument_properties_string
 
 import logging
 logger = logging.getLogger(__name__)
@@ -27,9 +28,9 @@ class Test(unittest.TestCase):
 
         self.resourceName = 'PXI4::4-0.0::INSTR'
         
-        ffts = UHSFFTS_32k(self.resourceName)
+        self.ffts = UHSFFTS_32k(self.resourceName)
         
-        self.cm = ConnectionManager(ffts)
+        self.cm = ConnectionManager(self.ffts)
         
 
     def tearDown(self):
@@ -44,6 +45,10 @@ class Test(unittest.TestCase):
         
         logger.info('Waiting for connection')
         self.cm.connected.wait()
+        
+        with self.ffts.lock:
+            deviceinfo = get_instrument_properties_string(self.ffts)
+            logger.info(deviceinfo)
         
         self.cm.disconnect()
 

@@ -103,6 +103,8 @@ def get_instrument_properties(device):
     result['Driver_Revision']               = device.instrument.Identity.Revision        #: 1.8.444.4 (Fundamental 1.8.1470.4 svn #64330M)
 
     result['Driver_IoResourceDescriptor']   = device.instrument.DriverOperation.IoResourceDescriptor  #: PXI4::4-0.0::INSTR
+    
+    result['License_OK']                    = device.license_ok
 
     
     return result
@@ -122,6 +124,7 @@ def get_instrument_properties_string(device):
     result.append('Driver:')
     result.append('  {0}: {1}'.format('ID' ,        prop['Driver_Identifier']))
     result.append('  {0}: {1}'.format('Revision' ,        prop['Driver_Revision']))
+    result.append('License OK: {0}'.format(prop['License_OK']))
     
     return '\n'.join(result)
     

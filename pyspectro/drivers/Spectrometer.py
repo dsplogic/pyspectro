@@ -16,7 +16,10 @@ from .dsplogic import BUFFER_ID
 from ..common.bitreversal import bitrevorder
 from ..common.bitmanipulation import testBit, setBit, clearBit
 from .AgMD2Digitizer import KeysightDigitizer
+from .license import read_license_keys
 
+import logging
+logger = logging.getLogger(__name__)
 
 """ Driver register map
 
@@ -37,8 +40,16 @@ REGISTER_MAP = {
     '_tg_ph4'      : 0x3330,
     '_tg_ph5'      : 0x3334,
     '_tg_ph6'      : 0x3338,
-    '_tg_ph7'      : 0x333c
+    '_tg_ph7'      : 0x333c,
+    'lic_stat'     : 0x3400,
+    'lic_key_0'    : 0x3404,
+    'lic_key_1'    : 0x3408,
+    'lic_key_2'    : 0x340C,
+    'lic_key_3'    : 0x3410
 }
+
+
+
 
 
 
@@ -106,6 +117,9 @@ class Spectrometer(KeysightDigitizer):
     #: Current measurement count (Read-Only)
     overflow = property(lambda self: self.read_register('overflow')) 
 
+    #: Check License Status (Read-Only)
+    license_ok = property(lambda self: (testBit( self.read_register('lic_stat'), 1) > 0) ) 
+
     #: An memory error
     memoryError = Property()
     
@@ -137,6 +151,7 @@ class Spectrometer(KeysightDigitizer):
         super(Spectrometer, self).__init__(resourceName=resourceName, **kwargs)
         
         self.interleaving = True
+
         
     def read_register(self, reg):
         """ Read control register
@@ -172,6 +187,52 @@ class Spectrometer(KeysightDigitizer):
 
         else:
             raise Exception('Invalid register %s' % reg)
+        
+        
+    def connect(self):
+        
+        #: Call superclass (AgMD2Device) connection function
+        connected = super(Spectrometer, self).connect()
+        
+        if connected:
+            
+            #: Get license and apply to instrument
+            self._get_license()
+        
+        return connected
+        
+        
+    def _get_license(self):
+        """ Read license from file and write to instrument  
+        
+        """
+        #: Read device serial number
+        serial_no = self.instrument.InstrumentInfo.SerialNumberString
+
+        #: Read license file
+        logger.info('Getting license for instrument: %s' % serial_no)
+        keys, err, licfile = read_license_keys(serial_no)
+
+        if err:            
+            logger.error(err)
+            return
+        else:
+            logger.info('License file OK: %s' % licfile)
+        
+        #: Apply license
+        self.write_register('lic_key_0', int(keys['key0'], 16) )
+        self.write_register('lic_key_1', int(keys['key1'], 16) )
+        self.write_register('lic_key_2', int(keys['key2'], 16) )
+        self.write_register('lic_key_3', int(keys['key3'], 16) )
+
+        result = self.read_register('lic_stat') 
+        if result == 3:
+            logger.info('License OK for instrument %s' % serial_no)
+        elif result == 1:
+            logger.error('Invalid license key for instrument %s' % serial_no)
+        else:
+            logger.error('Incompatible bitfile %s.  Please update bitfile' % self.bitfile)
+        
 
     def read_memory(self, chan):
         """ Read (partial) measurement from digitizer memory
@@ -342,7 +403,8 @@ class Spectrometer(KeysightDigitizer):
 """
 def UHSFFTS_32k(resourceName=''):
     
-    bitfile = 'U5303ADPULX2FDK_uhsffts_32k_float_1_0_229.bit'
+    #bitfile = 'U5303ADPULX2FDK_uhsffts_32k_float_1_0_229.bit'
+    bitfile = 'U5303ADPULX2FDK_uhsffts_32k_float_1_1_231.bit'
     
     return Spectrometer(resourceName, bitfile=bitfile, _float=True, _Nfft = 32768)
 
@@ -403,7 +465,6 @@ class MemoryConverter(Atom):
 
 
 if __name__ == "__main__":
-
 
     pass
     
