@@ -12,34 +12,48 @@ from __future__ import (division, print_function, absolute_import)
 
 
 import threading
+import h5py
+import logging
+import os
+import numpy as np
 from atom.api import Atom, Str, Value, Enum, Int, Typed, List
 from .acq_control import AcquisitionDataBuffer
-
-import numpy as np
-
-import h5py
-
-import logging
-from __builtin__ import file
-logger = logging.getLogger(__name__)
-
-            
 from .processor import CommandThread            
+from __builtin__ import file
+import time
+
+logger = logging.getLogger(__name__)
             
-
-def log_acquisition_data(acq_buf):
-    """
-    
-    """
-    with acq_buf.lock:
-        
-        logger.info('Logging acq_buf')
-        
-
+#: Get user home directory
+HOME = os.path.expanduser('~')
+PYHOME =  os.path.join(HOME, 'pyspectro')  
+if not os.path.exists(PYHOME):
+    os.makedirs(PYHOME)          
 
 class SpectrumDataLogger(CommandThread):
+    """ Spectrum Data Logger
     
+    This thread logs instrument data.
+    
+    A new file is created for each acquisition.
+    
+    Properties:
+    -----------
+    
+    max_measurements_per_acq : int
+    
+        The maximum number of measurements recorded per acquisition
+        in continuous mode. Measurements beyond this number
+        will not be recorded
+    
+    """
+
+    #: Maximum number of measurements per dataset
+    max_measurements_per_acq = Int(100)
+    
+    #: An event that can be used when storing to data files is complete
     store_done = Typed(threading._Event, ())
+
 
     _acq_buf = Typed(AcquisitionDataBuffer)
     
@@ -56,12 +70,16 @@ class SpectrumDataLogger(CommandThread):
     _dset_fftdata      = Value()
     _dset_num_averages = Value()
     _dset_msrmt_num    = Value()
-    
-    _max_records_per_dataset = Int(100)
-    
     _current_idx = Int(0)
     
     def __init__(self, acq_buf):
+        """ Initialize the SpectrumDataLogger thread
+        
+        Parameters
+        ----------
+        acq_buf : AcquisitionDataBuffer
+            Acquisiton Data Buffer
+        """
         self._acq_buf = acq_buf
     
     def terminate(self):
@@ -77,19 +95,26 @@ class SpectrumDataLogger(CommandThread):
         
         """
 
-        self._file = h5py.File("pyspectro_data_log.hdf5", "w")
 
-
-        while True: # not self._terminate.wait(0.1):
+        #: Main Loop
+        while True: 
             
             if self._state   == 'idle':
                 self._state = 'prepare'
                 
             elif self._state == 'prepare':
-
-                N = self._max_records_per_dataset
                 
-                #: Create a group to contain the next acquisition
+                #: Prepare for a new acquisition
+                #: Create file to hold acquisiton data
+                timestr = time.strftime("%Y%m%d_%H%M%S")
+                fname = "%s-pyspectro_acq_data.hdf5" %  timestr
+                fullfile = os.path.join(PYHOME, fname)                
+                self._file = h5py.File(fullfile, "w")
+
+
+                N = self.max_measurements_per_acq
+                
+                #: Create a group for each acquisition
                 self._groupid += 1
                 
                 groupname = 'acq{0:08d}'.format(self._groupid)
@@ -120,14 +145,22 @@ class SpectrumDataLogger(CommandThread):
             elif self._state == 'running':
                 
                 cmd = self._get_cmd()
+                
                 if cmd == 'store':
+                    
                     self._state = 'storing'
+                    
                 elif cmd == 'stop':
+                    
+                    #: Acquisiton is complete.  Close and flush file.  Get ready for another.
+                    self._file.flush()
+                    self._file.close()
+                    
                     self._state = 'prepare'
             
             elif self._state == 'storing':
                 
-                if self._current_idx < self._max_records_per_dataset:
+                if self._current_idx < self.max_measurements_per_acq:
                     
                     with self._acq_buf.lock:
                         
@@ -143,6 +176,8 @@ class SpectrumDataLogger(CommandThread):
                         self._current_idx += 1
                         # Store measurement count
                         self._group.attrs['count'] = self._current_idx
+                        #: Set acquisition count (will always be one in this case)
+                        self._file.attrs['n_acq'] = self._groupid
                 
                 else:
                     logger.debug('Logger full, ignoring store command')
@@ -153,10 +188,10 @@ class SpectrumDataLogger(CommandThread):
                 self._state = 'running'
         
         #: Exiting main loop
-        self._file.attrs['n_acq'] = self._groupid - 1
-                    
+        #: Close and delete file that was prepared but not used             
         self._file.flush()
         self._file.close()
+        os.remove(fullfile)
             
         self._terminate.clear()
 
@@ -165,6 +200,7 @@ class SpectrumDataReader(Atom):
     """ Spectrum log file reader 
     
     Read a spectrom log file in HDF5 File format
+
     """
     
     #: Number of acquisitions
@@ -188,42 +224,30 @@ class SpectrumDataReader(Atom):
         n_acq = self._file.attrs['n_acq']
         
         logger.debug('Opened file {0}'.format(self._filepath))
-        logger.debug('Found {0} acquisitions'.format(n_acq))
         
-        #: Sort by acquisiton name (integer order)
+        #: Sort by acquisiton name (integer order), e.g. acq00000001
         keys = sorted(self._file.keys())
-        
-        #: Note that the HDF5 file always one extra empty group, corresponding to the
-        #: group that was prepared for the following measurement.  We strip it out here
         
         acquisitions = []
         for key in keys[0:n_acq]:
-            acquisitions.append(self._file[key])
+            acqgroup = self._file[key]
+            
+            fftdata = acqgroup['fftdata']
+            nrec,fftdiv2 = np.shape(fftdata)
+            count = acqgroup.attrs['count'] #: Measurement count
+            
+            acq_result = {}
+            acq_result['name']          = key
+            acq_result['msrmnt_count']  = count
+            acq_result['fftdata']       = fftdata[range(count), :] #: Trim to size
+            acq_result['num_averages']  = acqgroup['num_averages']
+            acq_result['msrmnt_idx']    = acqgroup['msrmt_num']
+
+            acquisitions.append(acq_result)
             
         self._acquisitions = acquisitions 
         
-        
-            
-            
-        
 
-
-#     def iter_acquisitions(self):
-#         """ Iterate over each acquisiton 
-#          
-#         """
-#         
-#         return len(self._file.keys())
-    
-    
-        
-        
-#     def info(self):
-#         result = {}
-#         result['Nacq'] = self.num_acquisitions()
-#         
-#         return result
-        
         
         
         
