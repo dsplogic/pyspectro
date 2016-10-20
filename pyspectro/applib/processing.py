@@ -14,7 +14,6 @@ import numpy as np
 
 
 
-
 def convert_raw_to_fs(fft_raw, numAverages):
     """ Convert raw measurement to units of RMS power relative to full-scale input
 
@@ -22,8 +21,13 @@ def convert_raw_to_fs(fft_raw, numAverages):
     fftdata.size = Nfft/2
     """
     
-    #: Assume real data for number of frequencies    
-    nfftDiv2 = np.double(fft_raw.size)
+    #: Assume real data for number of frequencies
+    if fft_raw.ndim == 1:
+        N = 1;
+        nfftDiv2 = np.size(fft_raw) 
+    elif fft_raw.ndim == 2:   
+        N,nfftDiv2 = np.shape(fft_raw) 
+        nfftDiv2 = np.double(nfftDiv2)
     
     #:  Compute scale factor
     scale = (nfftDiv2)**2 * np.double(numAverages)
