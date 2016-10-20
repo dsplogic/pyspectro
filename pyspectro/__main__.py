@@ -14,21 +14,14 @@ import enaml
 import sys, os
 import pyspectro.gui
 import types
+import time
 
 #: Enable logging for main thread
 import logging
-logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.DEBUG,
-                    format="%(relativeCreated)5d %(threadName)10s %(levelname)-8s %(message)-60s  <%(name)-15s>",
-                    filename='pyspectro.log',
-                    filemode='w')
 
-#: Log to console
-console = logging.StreamHandler()
-console.setLevel(logging.INFO)
-formatter=logging.Formatter("%(relativeCreated)5d %(levelname)-8s %(message)-60s")
-console.setFormatter(formatter)
-logging.getLogger('').addHandler(console)
+#: Data log file
+HOME    = os.path.expanduser('~')
+PYHOME =  os.path.join(HOME, 'pyspectro')  
 
 def main():
     
@@ -37,6 +30,7 @@ def main():
     enaml_file = os.path.join(pyspectro.gui.__path__[0],'pyspectro_top.enaml')
     module = types.ModuleType('__main__')
     module.__file__ = os.path.abspath(enaml_file)
+    
     sys.modules['__main__'] = module
     ns = module.__dict__
 
@@ -58,6 +52,28 @@ def main():
 
 if __name__ == '__main__': 
     
+    """ Setup logging
+    
+    """
+    if not os.path.exists(PYHOME):
+        os.makedirs(PYHOME)          
+    
+    timestr = time.strftime("%Y%m%d_%H%M%S")
+    fname = "%s-pyspectro_log.txt" %  timestr
+    logfilename = os.path.join(PYHOME, fname)                
+    logger = logging.getLogger(__name__)
+    logging.basicConfig(level=logging.INFO,
+                        format="%(relativeCreated)5d %(threadName)10s %(levelname)-8s %(message)-60s  <%(name)-15s>",
+                        filename=logfilename,
+                        filemode='w')
+    
+    #: Add console StreamHandler to RootLogger
+    console = logging.StreamHandler()
+    console.setLevel(logging.INFO)
+    formatter=logging.Formatter("%(relativeCreated)5d %(levelname)-8s %(message)-60s")
+    console.setFormatter(formatter)
+    logging.getLogger('').addHandler(console)
+
     main()
 
     
