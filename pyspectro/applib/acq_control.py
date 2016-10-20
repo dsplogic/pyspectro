@@ -37,14 +37,20 @@ class AcquisitionDataBuffer(Atom):
     
     A container to store the results of an acquisiton.
     No type validation is done for speed.
-    """
-    lock       = Value(factory=threading.Lock)
     
+    Properties
+    ----------
+    
+    lock : threading.Lock
+        This lock must be obtained before reading or writing any other fields.
+        
+    numAverages: int
+        
+    """
+    
+    lock         = Value(factory=threading.Lock)
     numAverages  = Value()
     fftdata      = Value()
-    #data_ddra    = Value()
-    #data_ddrb    = Value()
-
     stats        = Typed(AcquisitionStats)
 
     def clear(self):
@@ -186,42 +192,34 @@ class AcquisitionControlInterface(Atom):
         """ Update acquisiton buffer with data from memory
         
         """
-#         if self.buffer_release.is_set():
-#             
-#             self.buffer_release.clear()
-#             #: Buffer has been released by processing
+        
+        got_buffer_lock = self.buffer.lock.acquire(False) #: Non-blocking
+
+        if got_buffer_lock:  
             
-        if self.buffer.lock.acquire(False):  #: Non-blocking
-            
+            #logger.debug('Got buffer lock')
             try:
-                
-                #logger.debug('Got buffer lock')
                 with self._device.lock:
                     data_ddra    = self._device.read_memory(1)
                     data_ddrb    = self._device.read_memory(2)
-                
-                self.buffer.fftdata      = self._converter.process(data_ddra, data_ddrb)
-                self.buffer.numAverages  = self._numAverages
-                self.buffer.stats        = self._stats
-                
-                self.dataReady.set()
-                
-                logger.info('Measurement {0} complete'.format(self._stats.Nmsr_total))
                     
             finally:
                 self.buffer.lock.release()
                 #logger.debug('Released buffer lock')
+                
+            self.buffer.fftdata      = self._converter.process(data_ddra, data_ddrb)
+            self.buffer.numAverages  = self._numAverages
+            self.buffer.stats        = self._stats
+            
+            self.dataReady.set()
+            
+            logger.info('Measurement {0} complete'.format(self._stats.Nmsr_total))
                 
         else:
             logger.warning('Buffer blocked, results not read from instrument')
             #: Buffer not available
             self._stats.Nmsr_blocked += 1
 
-#         else:
-#             logger.warning('Buffer not released, results not read from instrument')
-#             #: Buffer not available
-#             self._stats.Nmsr_blocked += 1
-        
                 
     def acqControlWorker(self):
         """ Acquisition control worker task

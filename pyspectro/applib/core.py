@@ -31,7 +31,7 @@ class PyspectroApp(Atom):
 
 
 class PySpectroCore(CommandThread):
-    """ Application Core
+    """ PySPectro Application Core
      
     """
     on_state_change    = Callable()
