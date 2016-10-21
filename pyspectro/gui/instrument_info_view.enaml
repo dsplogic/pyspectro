@@ -51,6 +51,11 @@ enamldef InstrumentInfoView(Container):
                 text << unicode(instrumentInfoModel.Instrument_FirmwareRevision)
 
             Label:
+                text = "SpectroCore License OK:"
+            Label:
+                text << unicode(instrumentInfoModel.license_ok)
+
+            Label:
                 text = "IO Version:"
             Label:
                 text << unicode(instrumentInfoModel.Instrument_IOVersion)

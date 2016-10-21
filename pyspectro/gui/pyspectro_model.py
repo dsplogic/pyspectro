@@ -95,6 +95,7 @@ class InstrumentProperties(Atom):
     Driver_Identifier             = Value()
     Driver_Revision               = Value()
     Driver_IoResourceDescriptor   = Value()
+    license_ok                    = Value()
     
 class Temperatures(Atom):
     
@@ -306,6 +307,7 @@ class SpectroModel(Atom):
                 self.instrumentProperties.Driver_Identifier           = result['Driver_Identifier']            
                 self.instrumentProperties.Driver_Revision             = result['Driver_Revision']              
                 self.instrumentProperties.Driver_IoResourceDescriptor = result['Driver_IoResourceDescriptor']  
+                self.instrumentProperties.license_ok                  = result['license_ok']  
 
                 #: Get properties from device
                 self.refreshProperties()

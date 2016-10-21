@@ -23,6 +23,26 @@ import logging
 HOME    = os.path.expanduser('~')
 PYHOME =  os.path.join(HOME, 'pyspectro')  
 
+if not os.path.exists(PYHOME):
+    os.makedirs(PYHOME)          
+
+timestr = time.strftime("%Y%m%d_%H%M%S")
+fname = "%s-pyspectro_log.txt" %  timestr
+logfilename = os.path.join(PYHOME, fname)                
+logger = logging.getLogger(__name__)
+logging.basicConfig(level=logging.INFO,
+                    format="%(relativeCreated)5d %(threadName)10s %(levelname)-8s %(message)-60s  <%(name)-15s>",
+                    filename=logfilename,
+                    filemode='w')
+
+#: Add console StreamHandler to RootLogger
+console = logging.StreamHandler()
+console.setLevel(logging.INFO)
+formatter=logging.Formatter("%(relativeCreated)5d %(levelname)-8s %(message)-60s")
+console.setFormatter(formatter)
+logging.getLogger('').addHandler(console)
+
+
 def main():
     
     #sys.path.insert(0, os.path.normpath(pyspectro.gui.__path__[0]) )
@@ -55,24 +75,6 @@ if __name__ == '__main__':
     """ Setup logging
     
     """
-    if not os.path.exists(PYHOME):
-        os.makedirs(PYHOME)          
-    
-    timestr = time.strftime("%Y%m%d_%H%M%S")
-    fname = "%s-pyspectro_log.txt" %  timestr
-    logfilename = os.path.join(PYHOME, fname)                
-    logger = logging.getLogger(__name__)
-    logging.basicConfig(level=logging.INFO,
-                        format="%(relativeCreated)5d %(threadName)10s %(levelname)-8s %(message)-60s  <%(name)-15s>",
-                        filename=logfilename,
-                        filemode='w')
-    
-    #: Add console StreamHandler to RootLogger
-    console = logging.StreamHandler()
-    console.setLevel(logging.INFO)
-    formatter=logging.Formatter("%(relativeCreated)5d %(levelname)-8s %(message)-60s")
-    console.setFormatter(formatter)
-    logging.getLogger('').addHandler(console)
 
     main()
 
