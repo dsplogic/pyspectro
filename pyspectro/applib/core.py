@@ -26,25 +26,27 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class PyspectroApp(Atom):
-    pass
-
-
 class PySpectroCore(CommandThread):
     """ PySPectro Application Core
-     
+
+    This is the main PySpectro application thread and the interface to
+    the PySpectro GUI.  It can also be used programmatically by user code.  
+    
     """
-    on_state_change    = Callable()
-    on_user_data_ready = Callable()
-    on_heartbeat_task  = Typed(ProcessTask)
+    
+    #: Interfaces to user code
+    on_state_change    = Callable()  #: Executes whenever core state changes.
+    on_user_data_ready = Callable()  #: Executes whenver data is ready in acquisiton buffer
+    on_heartbeat_task  = Typed(ProcessTask) #: Executes on heartbeat
     
     #: Outgoing thread events
     connect_event         = Typed(threading._Event, ())
     disconnect_event      = Typed(threading._Event, ())
     start_event           = Typed(threading._Event, ())
     stop_event            = Typed(threading._Event, ())
-    
-    
+
+    #: USER_DATA interface
+    #: -------------------    
     #: Incoming event to indicate user has requested data
     user_data_request     = Typed(threading._Event, ())
     #: Outgoing indicate indicating that the user_data buffer has been loaded
@@ -52,31 +54,36 @@ class PySpectroCore(CommandThread):
     #: User data buffer.  Should be read using lock
     user_data = Typed(AcquisitionDataBuffer, args=())
 
-    #: Device driver 
-    #: Can be accessed by main thread when done with care
-    #: Set properties only core is in idle state. 
-    #: Use lock whenever setting properties
+    #: Device Driver
+    #: -------------------    
+    #: Procide user access to Device driver 
+    #: Must obtain device.lock when accessing
+    #: Set properties only when PySpectroCore is in idle state. 
     #: Read minimal properties during acquisition 
     device = Typed(Spectrometer)
 
     #: Valid commands that can be sent to core thread
+    #: Thise commands private and should only be affected through use of 
+    #: class methods.
     _valid_commands = ['connect','disconnect','start','stop','terminate']
     
 
-    #: Child threads        
+    #: Private Child threads        
     _acq  = Typed(AcquisitionControlInterface)
     _con  = Typed(ConnectionManager)
     _log  = Typed(SpectrumDataLogger)
-    _hb   = Typed(TimedProcessor)
+    _hb   = Typed(TimedProcessor)   #: Heartbeat
 
     #: Heartbeat event produved by hearbeat thread
     _heartbeat_event = Typed(threading._Event, ())
     
-    _logging = False
+    #: Logging is currently enabled at all times.
+    _logging = True
  
     #: Private storage for worker thread
     _state        = Enum('disconnected','connecting','idle','acq_start','acquiring','acq_done')
-    
+
+    #: Initialization flag    
     _initialized  = Bool()
     
     def __init__(self, *args, **kwargs):
@@ -122,6 +129,9 @@ class PySpectroCore(CommandThread):
             self._initialized = True
 
     def terminate(self):
+        """ Safely terminate thread (and all child threads)
+        
+        """
         if self._initialized:
             
             self.send_command('terminate')
@@ -139,6 +149,15 @@ class PySpectroCore(CommandThread):
 
 
     def connect(self, resourceName):
+        """ Connect to instrument
+        
+        Parameters
+        ----------
+        
+        resourceName : str
+        
+            Instrument Resource identifier
+        """
         
         with self.device.lock:
             self.device.resourceName = resourceName
@@ -146,22 +165,29 @@ class PySpectroCore(CommandThread):
         self.send_command('connect')
         
     def disconnect(self, blocking = False):
+        """ Disconnect from instrument
         
+        """
         self._hb.stop()
-
         self.send_command('disconnect')
-        
         
 
     def start(self):
+        """ Start acquisition
+        
+        """
         self.send_command('start')
         
     def stop(self):
+        """ Stop acquisition
+        
+        """
         self.send_command('stop')
 
     def _main_loop(self):
-        """ State machine controller
-         
+        """ Main State machine controller
+        
+        A reimplemented CommandThread main loop method
         """
         #: Initialize comtypes for this thread using flags defined in sys.coinit_flags        
         import comtypes
