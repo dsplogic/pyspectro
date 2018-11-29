@@ -6,3 +6,4 @@ build
 dist
 pyspectro.egg*
 *.bak
+.settings/org.eclipse.core.resources.prefs
