@@ -16,8 +16,9 @@ a single acquisiton.
 """
 
 import logging
-from plot_helpers import plot_raw_data
-from pyspectro.drivers.Spectrometer import UHSFFTS_32k, MemoryConverter
+from .plot_helpers import plot_raw_data
+from pyspectro.drivers.Spectrometer import MemoryConverter
+from pyspectro.apps import UHSFFTS_32k
 
 #: Configure logging
 logger = logging.getLogger(__name__)

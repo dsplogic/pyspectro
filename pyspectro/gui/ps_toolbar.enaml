@@ -35,18 +35,24 @@ enamldef PsToolBar(ToolBar):
     #     enabled << connectButton.checked
     Label:
         text = 'Instrument  '
-        
-        
+
     Field: resourceId:
         placeholder = 'Resource ID'
         text := model.resourceName
         constraints = [width == 25]
 
+    Label:
+        text = '  FFT Length  '
+
+    ObjectCombo: app_nfft :
+        items = [32768,16384,8192,4096]
+        enabled << model.core_state == 'disconnected' 
+                
     Action: connectButton:
         text = 'Connect'
         enabled << model.core_state == 'disconnected' 
         triggered ::
-            model.connect()
+            model.connect(app_nfft.selected)
 
     Action: disConnectButton:
         text = 'Disconnect'

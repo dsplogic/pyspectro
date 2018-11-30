@@ -48,7 +48,7 @@ def discoverChannels(instr):
     Parameters
     ----------
     instr : AgMD2 object
-        Keysight instrument
+        Digitizer instrument
 
     Returns
     -------
@@ -75,7 +75,7 @@ def discoverLogicDevices(instr):
     Parameters
     ----------
     instr : AgMD2 object
-        Keysight instrument
+        Digitizer instrument
 
     Returns
     -------
@@ -102,7 +102,7 @@ def discoverMemoryBanks(instr):
     Parameters
     ----------
     instr : AgMD2 object
-        Keysight instrument
+        Digitizer instrument
 
     Returns
     -------
@@ -174,20 +174,20 @@ class AgMD2Device(Atom):
     #: the value is None.
     instrument = Typed(comtypes.IUnknown)  
     
-#     #: model :  IAgMD2Ex3 (* Not currently used *)
-#     #:     An application utility (helper) model (use is optional)
-#     #: This object provides a model of device parameters that can be used
-#     #: by a higher-level application.  It includes local storage for device 
-#     #: parameters and a mechanism to update/apply them through the COM
-#     #: interface.  Local storage is provided by Atom.Member objects that can
-#     #: be bound to an Enaml View to create a GUI application. The attributes 
-#     #: of this object closely mirror those of the 'instrument' object.  
-#     #: Care must be taken to only modify model parameters (Members) from the 
-#     #: main GUI thread.  In the case of Enaml, this is done using the 
-#     #: 'deferred_call()' mechanism.
-#     #: This object is only valid when the instrument is connected.  Otherwise
-#     #: the value is None.
-#     model = Typed(IAgMD2Ex3)
+    #: model :  IAgMD2Ex3 (* Not currently used *)
+    #:     An application utility (helper) model (use is optional)
+    #: This object provides a model of device parameters that can be used
+    #: by a higher-level application.  It includes local storage for device 
+    #: parameters and a mechanism to update/apply them through the COM
+    #: interface.  Local storage is provided by Atom.Member objects that can
+    #: be bound to an Enaml View to create a GUI application. The attributes 
+    #: of this object closely mirror those of the 'instrument' object.  
+    #: Care must be taken to only modify model parameters (Members) from the 
+    #: main GUI thread.  In the case of Enaml, this is done using the 
+    #: 'deferred_call()' mechanism.
+    #: This object is only valid when the instrument is connected.  Otherwise
+    #: the value is None.
+    #model = Typed(IAgMD2Ex3)
 
     #: The following are convenience properties to provide Pythonic 
     #: access to repeated resources found through discovery.  The objects
@@ -195,15 +195,16 @@ class AgMD2Device(Atom):
     channel     = Property(cached=True) #: Dict of IAgMD2Channel
     logicDevice = Property(cached=True) #: Dict of IAgMD2LogicDevice
     memoryBank  = Property(cached=True) #: Dict of IAgMD2LogicDeviceMemoryBank
-
+    options     = Property(cached=True)
+    
     #: Thread lock for protecting driver access to AgMD2Device.instrument
     #: The lock can be acquired/released externally using 
     #: AgMD2Device.lock.acquire() and AgMD2Device.lock.release()
     #: Accesses to AgMD2Device.instrument from multiple threads should be managed
     #: externally as required.
     lock = Value(factory=Lock)
-    
 
+    
     def _get_isConnected(self):
         
         if self.instrument:
@@ -211,6 +212,15 @@ class AgMD2Device(Atom):
                 return True
         
         return False
+    
+    def _get_options(self):
+        
+        if self.isConnected:
+        
+            optionstring = self.instrument.InstrumentInfo.Options
+            
+            return optionstring.split(',')
+            
     
     def connect(self):
         """ Connect to device 
@@ -235,10 +245,6 @@ class AgMD2Device(Atom):
         
                 #: Initialize Device
                 self.instrument.Initialize(self.resourceName, 0, 0, initstring)
-    
-                #: Initialize application utility model
-                #self.model = IAgMD2Ex3(name='IAgMD2Ex3model' , comif = self.instrument)
-                #self.model.initialize()
     
             except Exception as e:
                 
@@ -364,13 +370,23 @@ class AgMD2Device(Atom):
         #print('DELETED: Digitizer')
 
         
-class KeysightDigitizer(AgMD2Device):
-    """ Base driver for keysight digitizer
+class Digitizer(AgMD2Device):
+    """ Base driver for digitizer
     
     """
+    
+    def __init__(self, resourceName, **kwargs):
+        """ Initialize spectrometer driver
+        
+        Delegate initialization to superclass (Digitizer)
+        and turn on required interleaving
+        """
+
+        super(Digitizer, self).__init__(resourceName=resourceName, **kwargs)
+        
 
     #: interleaving Property 
-    interleaving = Bool(True)
+    interleaving = Bool(False)
 
     def _set_interleaving(self, val):
         if self.isConnected:
@@ -402,12 +418,12 @@ class KeysightDigitizer(AgMD2Device):
         
         """
         
-        success = super(KeysightDigitizer, self).connect()
+        success = super(Digitizer, self).connect()
         
-        if success:
-            
-            #: Reapply settings
-            self._set_interleaving(self.interleaving)
+        # if success:
+        #     
+        #     #: Reapply settings
+        #     self._set_interleaving(self.interleaving)
         
         return success
         

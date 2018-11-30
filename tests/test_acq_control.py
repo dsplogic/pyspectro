@@ -12,7 +12,7 @@ from __future__ import (division, print_function, absolute_import)
 
 import unittest
 
-from pyspectro.drivers.Spectrometer import UHSFFTS_32k
+from pyspectro.apps import UHSFFTS_32k
 from pyspectro.applib.acq_control import AcquisitionControlInterface
 from pyspectro.applib.processing import convert_raw_to_fs, convert_fs_to_dbfs
 

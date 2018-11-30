@@ -10,17 +10,17 @@
 from __future__ import (division, print_function, absolute_import)
 
 
-from atom.api import Atom, Typed, Str, Enum, Bool, Callable, observe, Value
+from atom.api import Typed,  Enum, Bool, Callable, observe, Int
 
-from .acq_control import AcquisitionControlInterface, AcquisitionDataBuffer
-
-from ..drivers.Spectrometer import Spectrometer, UHSFFTS_32k
-from .connection import ConnectionManager
-from .datalogger import SpectrumDataLogger
+from pyspectro.applib.acq_control import AcquisitionControlInterface, AcquisitionDataBuffer
+import pyspectro.apps
+from pyspectro.drivers.Spectrometer import Spectrometer
+from pyspectro.applib.connection import ConnectionManager
+from pyspectro.applib.datalogger import SpectrumDataLogger
 
 import threading
-from .processor import CommandThread, TimedProcessor, ProcessTask
-from .instrument_props import get_instrument_properties_string
+from pyspectro.applib.processor import CommandThread, TimedProcessor, ProcessTask
+from pyspectro.applib.instrument_props import get_instrument_properties_string
 
 import logging
 logger = logging.getLogger(__name__)
@@ -33,6 +33,9 @@ class PySpectroCore(CommandThread):
     the PySpectro GUI.  It can also be used programmatically by user code.  
     
     """
+    
+    #: Nfft requested by user.  This is used to load the correct application
+    app_Nfft = Int()
     
     #: Interfaces to user code
     on_state_change    = Callable()  #: Executes whenever core state changes.
@@ -86,11 +89,11 @@ class PySpectroCore(CommandThread):
     #: Initialization flag    
     _initialized  = Bool()
     
-    def __init__(self, *args, **kwargs):
+    def __init__(self, app, *args, **kwargs):
 
         super(PySpectroCore, self).__init__(*args, **kwargs)
         
-        self.device = UHSFFTS_32k()
+        self.device = Spectrometer(resourceName='', app=app)
         
         self._con = ConnectionManager(self.device)
         self._acq = AcquisitionControlInterface(self.device)
@@ -158,11 +161,12 @@ class PySpectroCore(CommandThread):
         
             Instrument Resource identifier
         """
-        
-        with self.device.lock:
-            self.device.resourceName = resourceName
+        if self.device:
+            with self.device.lock:
+                self.device.resourceName = resourceName
+                
+            self.send_command('connect')
             
-        self.send_command('connect')
         
     def disconnect(self, blocking = False):
         """ Disconnect from instrument

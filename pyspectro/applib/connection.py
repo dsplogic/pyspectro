@@ -13,8 +13,8 @@ from __future__ import (division, print_function, absolute_import)
 import threading
 from Queue import Queue
 
-from atom.api import Atom, Typed, Enum, Value
-from pyspectro.drivers.Spectrometer import Spectrometer
+from atom.api import Typed, Enum, Value
+from pyspectro.drivers.AgMD2Digitizer import Digitizer
 
 import logging
 logger = logging.getLogger(__name__)
@@ -48,7 +48,7 @@ class ConnectionManager(CommandThread):
     #_finish       = Typed(threading._Event, ())
     _state        = Enum('disconnected', 'connecting', 'connected', 'failed') 
     
-    _device   = Typed(Spectrometer)
+    _device   = Typed(Digitizer)
     
     def __init__(self, device):
         """ Initialize a Connection manager

@@ -18,7 +18,7 @@ Each memory is assigned a Buffer ID.
     By setting the Buffer ID in the PCIe interface a window with AXI4-Full base address and high address corresponding 
     to the selected memory area is opened, then memory can be accessed through Programmed I/O or DMA.
     
-    Buffer IDs 0..15 are reserved for the Keysight region. 
+    Buffer IDs 0..15 are reserved for the Digitizer region. 
     Buffer IDs 16..31 are available for the FDK User
 
 The user core FPGA code defines the following
