@@ -54,7 +54,6 @@ def main():
     sys.modules['__main__'] = module
     ns = module.__dict__
 
-
     with enaml.imports():
         from pyspectro.gui.pyspectro_view import Main
     

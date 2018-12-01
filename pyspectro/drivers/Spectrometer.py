@@ -10,12 +10,12 @@
 from __future__ import (division, print_function, absolute_import)
 
 #: Package imports
-from atom.api import Atom, Int, Bool, Property, Float, Typed        
+from atom.api import Atom, Int, Bool, Property, Float, Typed, Tuple, Unicode        
 import numpy as np
 from .dsplogic import BUFFER_ID
 from ..common.bitreversal import bitrevorder
 from ..common.bitmanipulation import testBit, setBit, clearBit
-from .AgMD2Digitizer import KeysightDigitizer
+from .AgMD2Digitizer import Digitizer
 from .license import read_license_keys
 
 import logging
@@ -48,12 +48,20 @@ REGISTER_MAP = {
     'lic_key_3'    : 0x3410
 }
 
+                
+class SpectrometerApplication(Atom):
 
-
-
-
-
-class Spectrometer(KeysightDigitizer):
+    Nfft = Int()
+    
+    complexData = Bool()
+    
+    required_hwcfg = Tuple(item=Unicode())
+    
+    bitfile = Unicode()
+    
+    floating_point = Bool()
+    
+class Spectrometer(Digitizer):
     """ Spectrometer driver
 
     This class implementes python driver for the DSPlogic's 
@@ -100,7 +108,7 @@ class Spectrometer(KeysightDigitizer):
     """
 
     #: FFT Length
-    Nfft = property(lambda self: self._Nfft)
+    Nfft = property(lambda self: self.app.Nfft)
 
     #: Number of averages (R/W)
     numAverages = Property()
@@ -123,15 +131,12 @@ class Spectrometer(KeysightDigitizer):
     #: An memory error
     memoryError = Property()
     
+    #: Application
+    app = Typed(SpectrometerApplication,())
+    
     
     #: PRIVATE PROPERTIES
     #:-------------------
-    
-    #: Floating-point enabled dsp core (private)
-    _float = Bool(False)
-    
-    #: Number of frequency bins (private)
-    _Nfft = Int()
     
     #: Test mode for internal use
     _testMode   = Property()
@@ -141,17 +146,18 @@ class Spectrometer(KeysightDigitizer):
     _testFreq  = Property()
     __testFreq = Float()
     
-    def __init__(self, resourceName, **kwargs):
+    def __init__(self, resourceName, app, **kwargs):
         """ Initialize spectrometer driver
         
-        Delegate initialization to superclass (KeysightDigitizer)
+        Delegate initialization to superclass (Digitizer)
         and turn on required interleaving
         """
 
-        super(Spectrometer, self).__init__(resourceName=resourceName, **kwargs)
+        super(Spectrometer, self).__init__(resourceName=resourceName, app=app, **kwargs)
         
-        self.interleaving = True
-
+        #: Set bitfile from application 
+        self.bitfile = self.app.bitfile
+        
         
     def read_register(self, reg):
         """ Read control register
@@ -195,17 +201,46 @@ class Spectrometer(KeysightDigitizer):
         connected = super(Spectrometer, self).connect()
         
         if connected:
+
+            #: Verify that application is supported
+
+            if not self.app_supported():
+                logger.error('Application not supported')
             
             #: Get license and apply to instrument
-            self._get_license()
+            if not self._get_license():
+                logger.error('Hardware license failed')
+                
         
         return connected
+        
+    def app_supported(self):
+        """ Check hardware support for application
+        
+        """
+        if self.isConnected:
+
+            app_ok = True
+            
+            for req in self.app.required_hwcfg:
+                
+                if req not in self.options:
+                    logger.error('Required hardware configuration not available: {}'.format(req))
+                    app_ok = False
+                    
+            return app_ok
+        
+        else:
+        
+            return None        
         
         
     def _get_license(self):
         """ Read license from file and write to instrument  
         
         """
+        lic_ok = False
+        
         #: Read device serial number
         serial_no = self.instrument.InstrumentInfo.SerialNumberString
 
@@ -228,11 +263,13 @@ class Spectrometer(KeysightDigitizer):
         result = self.read_register('lic_stat') 
         if result == 3:
             logger.info('License OK for instrument %s' % serial_no)
+            lic_ok = True
         elif result == 1:
             logger.error('Invalid license key for instrument %s' % serial_no)
         else:
             logger.error('Incompatible bitfile %s.  Please update bitfile' % self.bitfile)
         
+        return lic_ok
 
     def read_memory(self, chan):
         """ Read (partial) measurement from digitizer memory
@@ -256,7 +293,7 @@ class Spectrometer(KeysightDigitizer):
         
         """
 
-        nbrint32 = self._Nfft//2//2
+        nbrint32 = self.app.Nfft//2//2
         
         if chan == 1:
             
@@ -282,7 +319,7 @@ class Spectrometer(KeysightDigitizer):
         result      = np.array(data_int32[0][FirstValidPoint : FirstValidPoint + ActualPoints ],
                                dtype = np.uint32)
 
-        if self._float:
+        if self.app.floating_point:
             result = result.view('float32')
                     
         return result
@@ -398,17 +435,6 @@ class Spectrometer(KeysightDigitizer):
 
         
 
-""" Top level spectrometer classes for user instantiation
-
-"""
-def UHSFFTS_32k(resourceName=''):
-    
-    #bitfile = 'U5303ADPULX2FDK_uhsffts_32k_float_1_0_229.bit'
-    bitfile = 'U5303ADPULX2FDK_uhsffts_32k_float_1_1_231.bit'
-    
-    return Spectrometer(resourceName, bitfile=bitfile, _float=True, _Nfft = 32768)
-
-         
 class MemoryConverter(Atom):
     """ Convert DDR memory to FFT format 
     

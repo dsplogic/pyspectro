@@ -75,7 +75,7 @@ def process_buffer(acqbuffer):
 
 if __name__ == '__main__':
      
-    from pyspectro.drivers.Spectrometer import UHSFFTS_32k
+    from pyspectro.apps.Spectrometer import UHSFFTS_32k
 
     #: Connect to instrument
     ffts = UHSFFTS_32k(resourceName)

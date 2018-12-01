@@ -23,7 +23,7 @@ to proceeed while a connection is in process.
 
 """
 
-from pyspectro.drivers.Spectrometer import UHSFFTS_32k
+from pyspectro.apps import UHSFFTS_32k
 from pyspectro.applib.connection import ConnectionManager
 from pyspectro.applib.instrument_props import get_instrument_properties_string
 

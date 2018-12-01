@@ -24,6 +24,8 @@ from .cwtest_model import CwTestModel
 
 import logging
 from pyspectro.applib.processor import ProcessTask
+import pyspectro.apps
+
 logger = logging.getLogger(__name__)
 
 def apply_updated_temperatures(model, temperatures):
@@ -124,7 +126,8 @@ class InputSetting(Atom):
     
 class SpectroModel(Atom):
 
-    Nfft         = Int()
+    Nfft         = Int() 
+    
     SampleRate   = Float()
     
     inputSettings = Typed(InputSetting, ())
@@ -492,14 +495,27 @@ class SpectroModel(Atom):
                 self.acquisitionMode = 'One-shot'
 
 
-    def connect(self):
+    def connect(self, app_Nfft):
         """ Initiate a connection
         
         """
+        #: Get application to load into spectrometer
+        logger.info('Requested FFT Size: {}'.format(app_Nfft))
+            
+        app = pyspectro.apps.get_application(app_Nfft)
+        
+        if not app:
+            
+            logger.error('Application not found, FFT Size: {}'.format(app_Nfft))
+            logger.error('PySpectroCore initialization failed.')
+            
+            return
+
         
         if not self.core:
+            
             #: Instantiate Core
-            self.core = PySpectroCore()
+            self.core = PySpectroCore(app)
             
             #: Assign callback when state changes
             self.core.on_state_change= self._on_core_state_change

@@ -9,11 +9,11 @@
 #------------------------------------------------------------------------------
 from __future__ import (division, print_function, absolute_import)
 
-""" This module provides the data models used to represent a Keysight Digitizer.
+""" This module provides the data models used to represent a Digitizer.
 
 The IAgMD2Ex3 provides storage for hierarchical digitizer parameters at the application level.
 These attributes can be "applied" to the digitizer device or "updated" from the digitizer 
-device using the KeysightDigitizer driver.
+device using the Digitizer driver.
 
 """
 #------------------------------------------------------------------------------
@@ -344,7 +344,7 @@ class IAgMD2Ex3(DeviceParameterModel):
     def _get_root_lock(self):
         """ Get lock from IAgMD2Ex3 COM interface
 
-        The Keysight driver does not support the Utility.LockObject method:
+        The Digitizer driver does not support the Utility.LockObject method:
             AgMD2: Does not support this class-compliant feature: method LockObject
             
         Instead, use a shared lock from the driver that manages the COM interface.
@@ -365,8 +365,8 @@ class IAgMD2Ex3(DeviceParameterModel):
     
 if __name__ == '__main__':
     
-    from pyspectro.drivers.Spectrometer import UHSFFTS_32k
-    from atom.api import Bool, Int, Value
+    from pyspectro.apps import UHSFFTS_32k
+
 
     driver = UHSFFTS_32k('PXI4::4-0.0::INSTR')
     

@@ -104,7 +104,7 @@ def get_instrument_properties(device):
 
     result['Driver_IoResourceDescriptor']   = device.instrument.DriverOperation.IoResourceDescriptor  #: PXI4::4-0.0::INSTR
     
-    result['license_ok']                    = device.license_ok
+    result['license_ok']                    = getattr(device, 'license_ok', None)
 
     
     return result
