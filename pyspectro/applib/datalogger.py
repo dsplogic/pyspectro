@@ -19,7 +19,7 @@ import numpy as np
 from atom.api import Atom, Str, Value, Enum, Int, Typed, List
 from .acq_control import AcquisitionDataBuffer
 from .processor import CommandThread            
-from __builtin__ import file
+#from __builtin__ import file
 import time
 
 logger = logging.getLogger(__name__)
@@ -29,6 +29,12 @@ HOME = os.path.expanduser('~')
 PYHOME =  os.path.join(HOME, 'pyspectro')  
 if not os.path.exists(PYHOME):
     os.makedirs(PYHOME)          
+    
+import sys
+if sys.version_info[0] == 3:
+    EventClass = threading.Event
+else:
+    EventClass = threading._Event
 
 class SpectrumDataLogger(CommandThread):
     """ Spectrum Data Logger
@@ -52,7 +58,7 @@ class SpectrumDataLogger(CommandThread):
     max_measurements_per_acq = Int(100)
     
     #: An event that can be used when storing to data files is complete
-    store_done = Typed(threading._Event, ())
+    store_done = Typed(EventClass, ())
 
 
     _acq_buf = Typed(AcquisitionDataBuffer)

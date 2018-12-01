@@ -1,5 +1,5 @@
 #------------------------------------------------------------------------------
-# Copyright (c) 2016, DSPlogic, Inc.  All Rights Reserved.  
+# Copyright (c) 2016-2019, DSPlogic, Inc.  All Rights Reserved.  
 # 
 # RESTRICTED RIGHTS
 # Use of this software is permitted only with a software license agreement.
@@ -7,7 +7,6 @@
 # Details of the software license agreement are in the file LICENSE.txt, 
 # distributed with this software.
 #------------------------------------------------------------------------------
-from __future__ import (division, print_function, absolute_import)
 
 
 import threading
@@ -17,9 +16,14 @@ from atom.api import Atom, Typed, Value, Callable, Tuple, Dict, List, Float
 import logging
 logger = logging.getLogger(__name__)
     
-from Queue import Queue
+from queue import Queue
 
-
+import sys
+if sys.version_info[0] == 3:
+    EventClass = threading.Event
+else:
+    EventClass = threading._Event
+    
 class ProcessTask(Atom):
     """ An object representing a task
 
@@ -104,7 +108,7 @@ class CommandThread(Atom):
     """
     #: Private storage for worker thread
     _thread       = Typed(threading.Thread)
-    _terminate    = Typed(threading._Event, ())
+    _terminate    = Typed(EventClass, ())
     
     #: Command queue
     _command      = Value(factory = Queue)
@@ -176,14 +180,14 @@ class CommandThread(Atom):
 class ThreadedProcessor(Atom):
     
     #: Incoming event to initiate the processor task
-    start      = Typed(threading._Event, ()) #: Start Processing data
+    start      = Typed(EventClass, ()) #: Start Processing data
     
     #: Outgoing Event produced when processor task is complete
-    done       = Typed(threading._Event, ()) #: Done Processing Data
+    done       = Typed(EventClass, ()) #: Done Processing Data
 
     #: Private storage for worker thread
     _thread   = Typed(threading.Thread)
-    _finish   = Typed(threading._Event, ())
+    _finish   = Typed(EventClass, ())
     
     #: The callable to run when the task is executed.
     _task = Callable()
@@ -266,10 +270,10 @@ class SequentialProcessor(Atom):
     tasks      = List(item = ThreadedProcessor)
 
     #: Command to initiate the processor task
-    start      = Typed(threading._Event, ()) #: Start Processing data
+    start      = Typed(EventClass, ()) #: Start Processing data
     
     #: Event produced when processor task is complete
-    done       = Typed(threading._Event, ()) #: Done Processing Data
+    done       = Typed(EventClass, ()) #: Done Processing Data
 
     def __init__(self, tasks = []):
         """ Initialize a SequentialProcessor
@@ -321,7 +325,7 @@ class TimedProcessor(Atom):
     
     #: Private storage for worker thread
     _thread   = Typed(threading.Thread)
-    _finish   = Typed(threading._Event, ())
+    _finish   = Typed(EventClass, ())
     
     #: The callable to run when the task is executed.
     _task = Callable()

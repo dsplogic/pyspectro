@@ -7,7 +7,7 @@
 # Details of the software license agreement are in the file LICENSE.txt, 
 # distributed with this software.
 #------------------------------------------------------------------------------
-from __future__ import (division, print_function, absolute_import)
+
 
 """ Demonstrate time/frequency plot using HDF5 acquisition format
 

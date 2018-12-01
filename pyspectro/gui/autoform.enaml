@@ -27,7 +27,7 @@ from enaml.widgets.api import (
 )
 
 
-from ..common.parameters import _isParameter 
+from pyspectro.common.parameters import _isParameter 
 
 
 
@@ -54,7 +54,7 @@ template FormControl(Attr, MemberType):
     """
     Field:
         read_only = True
-        text << unicode(getattr(model, Attr))
+        text << '{}'.format(getattr(model, Attr))
 
 
 template FormControl(Attr, MemberType: Int):
@@ -259,7 +259,7 @@ class BarModel(Atom):
     trigger = Event()
     choices = Enum('first', 'second', 'third')
     def _observe_trigger(self, change):
-        print 'I was triggered'
+        print('I was triggered')
 
 
 enamldef Main(Window):

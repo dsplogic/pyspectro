@@ -169,7 +169,7 @@ class Spectrometer(Digitizer):
         
         """
         
-        if reg in REGISTER_MAP.iterkeys():
+        if reg in REGISTER_MAP:
             reg_addr = REGISTER_MAP[reg]
             reg = self.logicDevice['DpuA'].ReadRegisterInt32(reg_addr)
             return reg
@@ -187,7 +187,7 @@ class Spectrometer(Digitizer):
             32-bit register value
         
         """
-        if reg in REGISTER_MAP.iterkeys():
+        if reg in REGISTER_MAP:
             reg_addr = REGISTER_MAP[reg]
             self.logicDevice['DpuA'].WriteRegisterInt32(reg_addr, val)
 
@@ -204,7 +204,9 @@ class Spectrometer(Digitizer):
 
             #: Verify that application is supported
 
-            if not self.app_supported():
+            if self.app_supported():
+                logger.info('Application ready')
+            else:
                 logger.error('Application not supported')
             
             #: Get license and apply to instrument

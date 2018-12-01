@@ -1,0 +1,9 @@
+
+# Python 2.7 Setup
+conda create --name pyspectropy27 python=2.7
+conda install atom enaml h5py comtypes numpy  matplotlib configparser
+
+# Python 3.6 Setup
+#: configparser not required.  Only for Python 2
+conda create --name pyspectropy27 python=3.6
+conda install atom enaml h5py comtypes numpy  matplotlib

@@ -20,12 +20,12 @@ def prettyMembers(atomObject, indent = 1):
     
     members = atomObject.members()
     
-    maxNameLength = len( max(members.iterkeys(), key=len) )
+    maxNameLength = len( max( list(members), key=len) )
     
     formatStr = "{0:>%s} : {1}" % (maxNameLength + indent)
     
     result = []
-    for name in members.iterkeys():
+    for name in members:
         val = getattr(atomObject, name)
         result.append(format(formatStr.format(name, str(val))))
         
