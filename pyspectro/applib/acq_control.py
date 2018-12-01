@@ -9,9 +9,10 @@
 #------------------------------------------------------------------------------
 from __future__ import (division, print_function, absolute_import)
 
+    
 from atom.api import Atom, Typed, Value, Callable, Float, Int, Str
 import threading
-import Queue
+import queue
 import time
 
 import logging
@@ -19,6 +20,13 @@ logger = logging.getLogger(__name__)
 
 
 from ..drivers.Spectrometer import Spectrometer, MemoryConverter
+
+import sys
+if sys.version_info[0] == 3:
+    EventClass = threading.Event
+else:
+    EventClass = threading._Event
+    
 
 class AcquisitionStats(Atom):
     """ Acquistion statistics
@@ -69,10 +77,10 @@ class AcquisitionControlInterface(Atom):
     """
     
     #: Outgoing event issued when acquisition is started
-    start_event = Typed(threading._Event, ())
+    start_event = Typed(EventClass, ())
 
     #: Outgoing event issued when acquisition is stopped
-    stop_event = Typed(threading._Event, ())
+    stop_event = Typed(EventClass, ())
     
     #: Acquisition buffer
     #: Note that passing empty args causes buffer to be created upon initialization
@@ -82,10 +90,10 @@ class AcquisitionControlInterface(Atom):
     acqState = property(lambda self: self._acqState)
     
     #: Outgoing event indicating that data is available in the buffer.
-    dataReady  = Typed(threading._Event, ())
+    dataReady  = Typed(EventClass, ())
 
     #: Incoming event indicating that the buffer is free to be re-used.
-    buffer_release  = Typed(threading._Event, ())
+    buffer_release  = Typed(EventClass, ())
     
     #: Private storate
     _device      = Typed(Spectrometer)
@@ -101,7 +109,7 @@ class AcquisitionControlInterface(Atom):
     _interval  = Float()
     
     #: Command queue for sending commands to the worker thread.
-    _command  = Value(factory = Queue.Queue)
+    _command  = Value(factory = queue.Queue)
 
     #: Private storage for thread object    
     _thread  = Typed(threading.Thread)
@@ -246,7 +254,7 @@ class AcquisitionControlInterface(Atom):
         prior_count  = 0
         
         #: Main thread loop
-        while ACQ_STATE <> 'terminated':
+        while ACQ_STATE != 'terminated':
 
             time.sleep(self._interval)
 

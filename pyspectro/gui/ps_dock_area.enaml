@@ -1,5 +1,5 @@
 #------------------------------------------------------------------------------
-# Copyright (c) 2016, DSPlogic, Inc.  All Rights Reserved.  
+# Copyright (c) 2016-2019, DSPlogic, Inc.  All Rights Reserved.  
 # 
 # RESTRICTED RIGHTS
 # Use of this software is permitted only with a software license agreement.
@@ -7,9 +7,6 @@
 # Details of the software license agreement are in the file LICENSE.txt, 
 # distributed with this software.
 #------------------------------------------------------------------------------
-from __future__ import (division, print_function, absolute_import)
-
-
 
 from enaml.layout.api import vbox, hbox, grid,  spacer, DockLayout, HSplitLayout, VSplitLayout, TabLayout, InsertItem, align
 from enaml.widgets.api import MainWindow, Container, DockArea, DockItem, PushButton, Slider, \
@@ -21,20 +18,20 @@ from enaml.widgets.api import MainWindow, Container, DockArea, DockItem, PushBut
 from enaml.stdlib.fields import IntField, FloatField
 
 
-from .channel_view    import ChannelDockItem, ChannelWindow
-from .pyspectro_model import SpectroModel
+from pyspectro.gui.channel_view    import ChannelDockItem, ChannelWindow
+from pyspectro.gui.pyspectro_model import SpectroModel
 
 from atom.api import Atom, Typed, ForwardTyped, observe
 
 
 from enaml.stdlib.message_box import MessageBox, information, question, warning
     
-from .pyspectro_top import ConsoleView, CalibrationView
-from .inputsettings_view import InputSettingsView
-from .spectral_view import SpectralView
-from .monitor_view import MonitorView
-from .cwtest_view import CwTestView
-from .acq_control_view import AcquisitionControlView
+from pyspectro.gui.pyspectro_top import ConsoleView, CalibrationView
+from pyspectro.gui.inputsettings_view import InputSettingsView
+from pyspectro.gui.spectral_view import SpectralView
+from pyspectro.gui.monitor_view import MonitorView
+from pyspectro.gui.cwtest_view import CwTestView
+from pyspectro.gui.acq_control_view import AcquisitionControlView
     
 class MainAreaController(Atom):
    

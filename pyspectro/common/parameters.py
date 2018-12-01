@@ -1,5 +1,5 @@
 #------------------------------------------------------------------------------
-# Copyright (c) 2016, DSPlogic, Inc.  All Rights Reserved.  
+# Copyright (c) 2016-2019, DSPlogic, Inc.  All Rights Reserved.  
 # 
 # RESTRICTED RIGHTS
 # Use of this software is permitted only with a software license agreement.
@@ -7,16 +7,14 @@
 # Details of the software license agreement are in the file LICENSE.txt, 
 # distributed with this software.
 #------------------------------------------------------------------------------
-from __future__ import (division, print_function, absolute_import)
+from  six import iteritems
 
-
-
-from atom.api import Atom, Typed, Value, Int, Bool, Enum, Property, Event
+from atom.api import Value, Int, Bool, Property, Event
 
 from enaml.core.object import Object, flag_generator, flag_property
 
 #: The flag indicating that the DeviceParameterModel object has been initialized.
-INITIALIZED_FLAG = flag_generator.next()
+INITIALIZED_FLAG = next(flag_generator)
 
 def _isParameter(member):
     if member.metadata:
@@ -156,7 +154,7 @@ class ParameterModel(Hobject):
         
         #: Search for and take ownership of any child ParameterModel objects
         #for name, member in self.members().iteritems():
-        for name, member in self.members().iteritems():
+        for name, member in self.members().items():
             
             #if type(member) is atom.scalars.Value:
             if _isChild(member):
@@ -176,11 +174,11 @@ class ParameterModel(Hobject):
     def _iter_param_members(self, writable= None):
         
         members = self.members()
-        for name, member in members.iteritems():
+        for name, member in members.items():
             if _isParameter(member):
                 
                 if writable is not None:
-                    if member.metadata['p_writable'] <> writable:
+                    if member.metadata['p_writable'] != writable:
                         continue
                 
                 yield name, member

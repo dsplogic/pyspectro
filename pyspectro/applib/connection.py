@@ -7,11 +7,11 @@
 # Details of the software license agreement are in the file LICENSE.txt, 
 # distributed with this software.
 #------------------------------------------------------------------------------
-from __future__ import (division, print_function, absolute_import)
+
 
 
 import threading
-from Queue import Queue
+from queue import Queue
 
 from atom.api import Typed, Enum, Value
 from pyspectro.drivers.AgMD2Digitizer import Digitizer
@@ -21,6 +21,12 @@ logger = logging.getLogger(__name__)
 
 from .processor import CommandThread
 
+import sys
+if sys.version_info[0] == 3:
+    EventClass = threading.Event
+else:
+    EventClass = threading._Event
+    
 class ConnectionManager(CommandThread):
     """ Threaded connection manager
     
@@ -34,9 +40,9 @@ class ConnectionManager(CommandThread):
     #: Command queue
     #command      = Value(factory = Queue)
 
-    connected    = Typed(threading._Event, ())
-    disconnected = Typed(threading._Event, ())
-    failed       = Typed(threading._Event, ())
+    connected    = Typed(EventClass, ())
+    disconnected = Typed(EventClass, ())
+    failed       = Typed(EventClass, ())
 
     connectionState = property(lambda self: self._state)
     
@@ -45,7 +51,7 @@ class ConnectionManager(CommandThread):
     
     #: Private storage for worker thread
     #_thread       = Typed(threading.Thread)
-    #_finish       = Typed(threading._Event, ())
+    #_finish       = Typed(EventClass, ())
     _state        = Enum('disconnected', 'connecting', 'connected', 'failed') 
     
     _device   = Typed(Digitizer)

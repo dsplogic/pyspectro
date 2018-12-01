@@ -25,7 +25,12 @@ from pyspectro.applib.instrument_props import get_instrument_properties_string
 import logging
 logger = logging.getLogger(__name__)
 
-
+import sys
+if sys.version_info[0] == 3:
+    EventClass = threading.Event
+else:
+    EventClass = threading._Event
+    
 class PySpectroCore(CommandThread):
     """ PySPectro Application Core
 
@@ -43,17 +48,17 @@ class PySpectroCore(CommandThread):
     on_heartbeat_task  = Typed(ProcessTask) #: Executes on heartbeat
     
     #: Outgoing thread events
-    connect_event         = Typed(threading._Event, ())
-    disconnect_event      = Typed(threading._Event, ())
-    start_event           = Typed(threading._Event, ())
-    stop_event            = Typed(threading._Event, ())
+    connect_event         = Typed(EventClass, ())
+    disconnect_event      = Typed(EventClass, ())
+    start_event           = Typed(EventClass, ())
+    stop_event            = Typed(EventClass, ())
 
     #: USER_DATA interface
     #: -------------------    
     #: Incoming event to indicate user has requested data
-    user_data_request     = Typed(threading._Event, ())
+    user_data_request     = Typed(EventClass, ())
     #: Outgoing indicate indicating that the user_data buffer has been loaded
-    user_data_ready_event = Typed(threading._Event, ())
+    user_data_ready_event = Typed(EventClass, ())
     #: User data buffer.  Should be read using lock
     user_data = Typed(AcquisitionDataBuffer, args=())
 
@@ -78,7 +83,7 @@ class PySpectroCore(CommandThread):
     _hb   = Typed(TimedProcessor)   #: Heartbeat
 
     #: Heartbeat event produved by hearbeat thread
-    _heartbeat_event = Typed(threading._Event, ())
+    _heartbeat_event = Typed(EventClass, ())
     
     #: Logging is currently enabled at all times.
     _logging = True

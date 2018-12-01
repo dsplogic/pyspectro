@@ -14,11 +14,10 @@ import time
 import numpy as np
 from atom.api import Atom, Int, Enum, Value, Typed, Bool, observe, Float, Tuple, Signal, Str, FloatRange
 from enaml.application import deferred_call, Application
-from ..drivers.Spectrometer import Spectrometer
-from ..common.console import ConsoleTextWriter 
-from ..applib.core import PySpectroCore    
-from ..applib.processor import TimedProcessor
-from ..applib.instrument_props import get_instrument_properties, get_slow_properties, get_temperature_properties
+from pyspectro.common.console import ConsoleTextWriter 
+from pyspectro.applib.core import PySpectroCore    
+from pyspectro.applib.processor import TimedProcessor
+from pyspectro.applib.instrument_props import get_instrument_properties, get_slow_properties, get_temperature_properties
 from .mpl_figure import SpectrumFigure
 from .cwtest_model import CwTestModel
 
@@ -254,7 +253,7 @@ class SpectroModel(Atom):
         
         """
 
-        if change['type'] <> 'update':
+        if change['type'] != 'update':
             return
 
         newval = change['value']
@@ -380,7 +379,7 @@ class SpectroModel(Atom):
         """ Start acquisitionn (one-shot or continuous mode)
         
         """
-        if self.core_state <> 'idle':
+        if self.core_state != 'idle':
             logger.info('Cannot start acquisition, instrument is in {0} state'.format(self.core_state))
             return
         
@@ -411,7 +410,7 @@ class SpectroModel(Atom):
         This method shoudld be called when acquiring in continuous more to stop processing.
         """
 
-        if self.core_state <> 'acquiring':
+        if self.core_state != 'acquiring':
             logger.warning('Cannot stop acquisition, instrument is in {0} state'.format(self.core_state))
             return
 
@@ -481,7 +480,7 @@ class SpectroModel(Atom):
 
     def setContinuousMode(self, value):
 
-        if self.core_state <> 'idle':
+        if self.core_state != 'idle':
             logger.warning('Cannot update continuous mode, instrument is in {0} state'.format(self.core_state))
             return
             
@@ -516,14 +515,17 @@ class SpectroModel(Atom):
             
             #: Instantiate Core
             self.core = PySpectroCore(app)
+            logger.debug('PySpectroCore Created')
             
             #: Assign callback when state changes
             self.core.on_state_change= self._on_core_state_change
+            logger.debug('Assigned state change callback')
     
             self.core.on_user_data_ready =  self.dataReadyCallback
 
             self.core.on_heartbeat_task = ProcessTask(heartbeat_task, (self,), {})
             
+        logger.debug('Connecting to resource {}'.format(self.resourceName))
         self.core.connect(self.resourceName)
         
                 

@@ -1,5 +1,5 @@
 #------------------------------------------------------------------------------
-# Copyright (c) 2016, DSPlogic, Inc.  All Rights Reserved.  
+# Copyright (c) 2016-2019, DSPlogic, Inc.  All Rights Reserved.  
 # 
 # RESTRICTED RIGHTS
 # Use of this software is permitted only with a software license agreement.
@@ -7,8 +7,6 @@
 # Details of the software license agreement are in the file LICENSE.txt, 
 # distributed with this software.
 #------------------------------------------------------------------------------
-from __future__ import (division, print_function, absolute_import)
-
 import unittest
 
 from pyspectro.applib.core import PySpectroCore
@@ -30,7 +28,10 @@ class Test(unittest.TestCase):
 
 
     def setUp(self):
-        self.core = PySpectroCore()
+        
+        import pyspectro.apps
+        
+        self.core = PySpectroCore(pyspectro.apps.get_application(32768))
         
         self.core.on_state_change= on_state_change
 

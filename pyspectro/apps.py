@@ -8,7 +8,7 @@
 # distributed with this software.
 #------------------------------------------------------------------------------
 
-from drivers.Spectrometer import Spectrometer, SpectrometerApplication
+from pyspectro.drivers.Spectrometer import Spectrometer, SpectrometerApplication
 
 
 def get_application(Nfft):
