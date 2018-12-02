@@ -52,6 +52,7 @@ class MplFigure(Atom):
     
     autoscale = Bool(True)
     
+    disableRefresh = Bool(False)
     
     number = property(lambda self: self.figure.number)
     
@@ -106,6 +107,10 @@ class MplFigure(Atom):
         return (self.xdata, self.ydata)
 
     def redraw(self, flush = False):
+        
+        if self.disableRefresh:
+            
+            return
 
         xdata, ydata = self.format_data()
         
@@ -177,7 +182,7 @@ class SpectrumFigure(MplFigure):
     units         = Enum( 'dBm', 'dB-FS', 'FS') #, 'mW'
     
     voltageRange  = Enum(1.0, 2.0)
-
+    
     def __init__(self, *args, **kwargs):
         
         super(SpectrumFigure, self).__init__(*args, **kwargs)
