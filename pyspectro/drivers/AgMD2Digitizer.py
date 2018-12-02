@@ -373,20 +373,10 @@ class Digitizer(AgMD2Device):
     """ Base driver for digitizer
     
     """
-    
-    def __init__(self, resourceName, **kwargs):
-        """ Initialize spectrometer driver
-        
-        Delegate initialization to superclass (Digitizer)
-        and turn on required interleaving
-        """
-
-        super(Digitizer, self).__init__(resourceName=resourceName, **kwargs)
-        
 
     #: interleaving Property 
-    interleaving = Bool(False)
-
+    interleaving = Property()
+    
     def _set_interleaving(self, val):
         if self.isConnected:
             #with self.lock:
@@ -419,10 +409,10 @@ class Digitizer(AgMD2Device):
         
         success = super(Digitizer, self).connect()
         
-        # if success:
-        #     
-        #     #: Reapply settings
-        #     self._set_interleaving(self.interleaving)
+#         if success:
+#              
+#             #: Reapply settings
+#             self._set_interleaving(self.interleaving)
         
         return success
         

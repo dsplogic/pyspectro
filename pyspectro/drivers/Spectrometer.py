@@ -50,6 +50,10 @@ REGISTER_MAP = {
 
                 
 class SpectrometerApplication(Atom):
+    """ Spectrometer application
+    
+    This object specifies a custom FFT spectrometer appliaction  
+    """
 
     Nfft = Int()
     
@@ -60,6 +64,7 @@ class SpectrometerApplication(Atom):
     bitfile = Unicode()
     
     floating_point = Bool()
+    
     
 class Spectrometer(Digitizer):
     """ Spectrometer driver
@@ -206,6 +211,16 @@ class Spectrometer(Digitizer):
 
             if self.app_supported():
                 logger.info('Application ready')
+                
+                #: Set HW interleaving as required by application
+                if self.app.complexData:
+                    self.interleaving = False
+                else:
+                    self.interleaving = True   
+
+                #: Reapply setup w/ application config    
+                self.instrument.Acquisition.ApplySetup()
+                             
             else:
                 logger.error('Application not supported')
             
