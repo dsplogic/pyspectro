@@ -376,6 +376,7 @@ class SpectroModel(Atom):
         df = self.SampleRate / 2.0 / 16384.0
         f = f * df
         f = f / 1e6
+        self.spectrumFigure.xrange = (0, np.max(f))
         self.spectrumFigure.xdata = f
             
                             

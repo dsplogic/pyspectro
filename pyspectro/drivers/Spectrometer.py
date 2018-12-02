@@ -59,6 +59,8 @@ class SpectrometerApplication(Atom):
     
     complexData = Bool()
     
+    interleaving = Bool()
+    
     required_hwcfg = Tuple(item=Unicode())
     
     bitfile = Unicode()
@@ -214,9 +216,15 @@ class Spectrometer(Digitizer):
                 
                 #: Set HW interleaving as required by application
                 if self.app.complexData:
-                    self.interleaving = False
+                    
+                    self.app.interleaving = False
+                    
                 else:
-                    self.interleaving = True   
+
+                    if self.app.interleaving:
+                        self.interleaving = True
+                    else:
+                        self.interleaving = False   
 
                 #: Reapply setup w/ application config    
                 self.instrument.Acquisition.ApplySetup()
