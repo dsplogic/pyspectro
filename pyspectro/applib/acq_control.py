@@ -321,6 +321,8 @@ class AcquisitionControlInterface(Atom):
                 else:
                     #: if cmd = '' or 'start'
                     with self._device.lock:
+                        
+                        #: Current count read from Spectrometer hardware
                         currentCount = self._device.measurementCount
                     
                     #:print('Current measurement count: %s.  Waiting for %s' % (currentCount, prior_count+1))

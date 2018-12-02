@@ -48,7 +48,11 @@ class Test(unittest.TestCase):
         with self.ffts.lock:
             deviceinfo = get_instrument_properties_string(self.ffts)
             logger.info(deviceinfo)
+            
+        print('Interleaving status: {}'.format(self.ffts.interleaving))
         
+        print('Current sample rate: {}'.format(self.ffts.instrument.Acquisition.SampleRate))
+            
         self.cm.disconnect()
 
         logger.info('Waiting for disconnect')

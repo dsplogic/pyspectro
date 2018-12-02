@@ -64,8 +64,8 @@ enamldef SpectralView(Container):  specView :
         
 
     constraints = [
-        vbox(     hbox(chk_tb, autoscale, units), canvas, picker ),
-        align('width', chk_tb, autoscale, units)
+        vbox(     hbox(chk_tb, autoscale, disableRefresh, units), canvas, picker ),
+        align('width', chk_tb, autoscale, disableRefresh, units)
     ]
     
     MPLCanvas: canvas:
@@ -92,6 +92,10 @@ enamldef SpectralView(Container):  specView :
                 specModel.yrange = (-110, 10)
                 specModel.autoscale = False
                 specModel.update_ylabel()
+
+    CheckBox: disableRefresh :
+        text = 'Disable refresh'
+        checked := specModel.disableRefresh
 
     CheckBox: autoscale:
         text = 'Auto Scale'

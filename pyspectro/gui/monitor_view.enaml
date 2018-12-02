@@ -17,13 +17,14 @@ from enaml.layout.api import horizontal, spacer
 enamldef MonitorView(Container):
     attr model
     
-    constraints = [ horizontal(grp_acq, spacer.flex(), grp_env, spacer.flex(), grp_cal)
+    constraints = [ horizontal(grp_acq, spacer.flex(), grp_env, spacer.flex(), grp_cfgv, spacer.flex(), grp_cal)
     ]
 
     GroupBox: grp_acq:
         title << "Acquisition"
         title_align << 'left'
         Form:
+            row_spacing << 1
             Label:
                 text = "# Acquisitions:"
             Label:
@@ -36,6 +37,10 @@ enamldef MonitorView(Container):
                 text = "Dropped:"
             Label:
                 text << '{}'.format(model.nDropped)
+            Label:
+                text = "Blocked:"
+            Label:
+                text << '{}'.format(model.nBlocked)
     
     GroupBox: grp_env:
         title << "Temperature (deg C)"
@@ -64,6 +69,19 @@ enamldef MonitorView(Container):
             # Label:
             #     text << '{0:>5.2f}'.format(model.temperatures.temp_dpu_c)
                 
+    GroupBox: grp_cfgv:
+        title << "Configuration"
+        title_align << 'left'
+        Form:
+            Label:
+                text = "Sample Rate"
+            Label:
+                text << '{}'.format(model.SampleRate)
+            Label:
+                text = "Nfft"
+            Label:
+                text << '{}'.format(model.Nfft)
+
                 
 
     GroupBox: grp_cal:

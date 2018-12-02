@@ -129,6 +129,8 @@ class SpectroModel(Atom):
     
     SampleRate   = Float()
     
+    interleaved  = Bool()
+    
     inputSettings = Typed(InputSetting, ())
     
     instrumentProperties = Typed(InstrumentProperties, ())
@@ -146,7 +148,7 @@ class SpectroModel(Atom):
 
     #: Acquisition        
     processLock         = Value(factory=threading.Lock)
-    processDropped      = Int()
+    guiProcessDropped   = Int()
     
     #: UHSFFTS Properties
     acquisitionMode = Enum('One-shot', 'Continuous')
@@ -177,6 +179,7 @@ class SpectroModel(Atom):
     nAcquisitions = Int()
     nMeasurements = Int() #: Number of measurements in prior acquisition
     nDropped      = Int() #: Number of measurements dropped
+    nBlocked      = Int() #: Number of measurement transfers blocked
     
     #: Dispaly refresh interval in continuous acquisition
     refresh_interval = Float(0.1)
@@ -202,9 +205,9 @@ class SpectroModel(Atom):
             - On *next* measurement event
                 - core updates core.user_data buffer
             - core asserts core.user_data_ready_event (this event not used)
-            - core initiates on_user_data_ready callback (self.dataReadyCallback)
-            - dataReadyCallback issues deferred_call to execute self.process_data on main GUI thread
-            - self.process_data issues .redraw() on figure
+            - core initiates on_user_data_ready callback (self.processDataInUiCallback)
+            - processDataInUiCallback issues deferred_call to execute self.process_data_in_gui on main GUI thread
+            - self.process_data_in_gui issues .redraw() on figure
             
         """
         #:logger.debug('REQUESTING DISPLAY UPDATE')
@@ -335,6 +338,7 @@ class SpectroModel(Atom):
                 self.nAcquisitions = 0
                 self.nMeasurements = 0
                 self.nDropped = 0
+                self.nBlocked = 0
 
                 
                 #: Signal GUI to open windows
@@ -400,6 +404,7 @@ class SpectroModel(Atom):
 
         self.nMeasurements = 0
         self.nDropped = 0
+        self.nBlocked = 0
         self.nAcquisitions += 1
         
         logger.info('Acquisition {0} started'.format(self.nAcquisitions))
@@ -421,7 +426,7 @@ class SpectroModel(Atom):
         self.core.send_command('stop')
 
 
-    def dataReadyCallback(self, result):
+    def processDataInUiCallback(self, result):
         """ Notification callback 
         
         A callback executed in the core worker thread after data has been
@@ -435,7 +440,7 @@ class SpectroModel(Atom):
         the Application task heap.
         """
         
-        #logger.debug('Running dataReadyCallback for measurement {0}'.format(result.stats.Nmsr_total))
+        #logger.debug('Running processDataInUiCallback for measurement {0}'.format(result.stats.Nmsr_total))
         
         #app = Application.instance()
         #pending = app._qapp.hasPendingEvents()
@@ -443,21 +448,29 @@ class SpectroModel(Atom):
         
         #logger.debug("Nmsr_total %s.  Missed: %s" % (result.Nmsr_ok, result.Nmsr_drop))  
  
+        #: Don't fetch/process data if refresh is disabled
+        if self.spectrumFigure.disableRefresh:
+            
+            return
+ 
         #: If prior processing is completed, initiate another event
         if self.processLock.acquire(False):
             
             try: 
                 #: Post event to Qt main event loop
-                deferred_call(self.process_data, result )                                      
+                deferred_call(self.process_data_in_gui, result )  
+                                                    
             finally:            
+                
                 self.processLock.release()
                 
         else:
             #: Lock unavaliable, drop event
-            self.processDropped = self.processDropped + 1
-            logger.debug('PROCESSES DROPPED: %s'  % self.processDropped)  
+            self.guiProcessDropped = self.guiProcessDropped + 1
+            
+            logger.debug('GUI Data processing blocked: %s'  % self.guiProcessDropped)  
 
-    def process_data(self, result):
+    def process_data_in_gui(self, result):
         """ Process spectrum data
         
         Process data on the main GUI thread.  Should only be called using deferred_call
@@ -477,6 +490,7 @@ class SpectroModel(Atom):
     
             self.nMeasurements = result.stats.Nmsr_total
             self.nDropped      = result.stats.Nmsr_drop
+            self.nBlocked      = result.stats.Nmsr_blocked
 
     def setContinuousMode(self, value):
 
@@ -521,7 +535,7 @@ class SpectroModel(Atom):
             self.core.on_state_change= self._on_core_state_change
             logger.debug('Assigned state change callback')
     
-            self.core.on_user_data_ready =  self.dataReadyCallback
+            self.core.on_user_data_ready =  self.processDataInUiCallback
 
             self.core.on_heartbeat_task = ProcessTask(heartbeat_task, (self,), {})
             
@@ -581,6 +595,7 @@ class SpectroModel(Atom):
                  
                 self.Nfft         = self.core.device.Nfft
                 self.SampleRate   = self.core.device.instrument.Acquisition.SampleRate
+                self.interleaved  = self.core.device.interleaving
                 self.inputSettings.voltageOffset = self.core.device.instrument.Channels['Channel1'].Offset
                 self.inputSettings.voltageRange  = self.core.device.instrument.Channels['Channel1'].Range
                 self.inputSettings.FilterBypass  = self.core.device.instrument.Channels['Channel1'].Filter.Bypass
