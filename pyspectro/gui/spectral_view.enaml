@@ -41,26 +41,26 @@ def update_label(specView, event):
     dataind = event.ind[indmin]
     closestPoint = (xdata[dataind], ydata[dataind])
 
-    specView.specModel.ind_selected = dataind
-    specView.specModel.selection_active = True
+    specView.spectrumFigure.ind_selected = dataind
+    specView.spectrumFigure.selection_active = True
 
     #: Update label
     #label = specView.find('picker_label')
     #label.text = "(%s, %s)" % closestPoint 
     
-    specView.specModel.redraw()
+    specView.spectrumFigure.redraw()
                     
                     
 enamldef SpectralView(Container):  specView :
 
-    attr specModel
+    attr spectrumFigure
     
     activated ::
-        specModel.figure.canvas.mpl_connect('pick_event', 
+        spectrumFigure.figure.canvas.mpl_connect('pick_event', 
                                functools.partial(update_label, self))
 
         canvas.toolbar_visible = True
-        specModel.autoscale = False
+        spectrumFigure.autoscale = False
         
 
     constraints = [
@@ -69,7 +69,7 @@ enamldef SpectralView(Container):  specView :
     ]
     
     MPLCanvas: canvas:
-        figure << specModel.figure
+        figure << spectrumFigure.figure
 
     CheckBox: chk_tb:
         text = 'Show Toolbar'
@@ -77,38 +77,38 @@ enamldef SpectralView(Container):  specView :
 
     ComboBox: units:
         items = ['dB-FS', 'FS', 'dBm'] #, 'mW'
-        index  << items.index(specModel.units)
-        selected_item >> specModel.units
+        index  << items.index(spectrumFigure.units)
+        selected_item >> spectrumFigure.units
         selected_item ::
             if selected_item == 'dB-FS':
-                specModel.yrange = (-120, 0)
-                specModel.autoscale = False
-                specModel.update_ylabel()
+                spectrumFigure.yrange = (-120, 0)
+                spectrumFigure.autoscale = False
+                spectrumFigure.update_ylabel()
             elif selected_item == 'FS':
-                specModel.yrange = (0, 1)
-                specModel.autoscale = False
-                specModel.update_ylabel()
+                spectrumFigure.yrange = (0, 1)
+                spectrumFigure.autoscale = False
+                spectrumFigure.update_ylabel()
             elif selected_item == 'dBm':
-                specModel.yrange = (-110, 10)
-                specModel.autoscale = False
-                specModel.update_ylabel()
+                spectrumFigure.yrange = (-110, 10)
+                spectrumFigure.autoscale = False
+                spectrumFigure.update_ylabel()
 
     CheckBox: disableRefresh :
         text = 'Disable refresh'
-        checked := specModel.disableRefresh
+        checked := spectrumFigure.disableRefresh
 
     CheckBox: autoscale:
         text = 'Auto Scale'
-        checked := specModel.autoscale
+        checked := spectrumFigure.autoscale
         toggled ::
             if checked:
-                specModel.ax.autoscale(enable=True, axis='both')
+                spectrumFigure.ax.autoscale(enable=True, axis='both')
             else:
-                specModel.ax.autoscale(enable=False, axis='both')
+                spectrumFigure.ax.autoscale(enable=False, axis='both')
     
             
     Label: picker :
         name = 'picker_label'
-        #enabled << specModel.selection_active
-        text << 'Selected: {0} MHz, {1:g} {2}'.format(specModel.val_selected[0], specModel.val_selected[1], specModel.units) #if enabled else ''
+        #enabled << spectrumFigure.selection_active
+        text << 'Selected: {0} MHz, {1:g} {2}'.format(spectrumFigure.val_selected[0], spectrumFigure.val_selected[1], spectrumFigure.units) #if enabled else ''
         

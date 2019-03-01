@@ -1,5 +1,33 @@
 # PySpectro Release Notes
 
+##Version 1.2
+
+###Description
+
+This major update adds support for multiple FFT sizes and complex input data, including:
+
+* Spectral plot frequency range of -Fs/2 to +Fs/2 for complex FFTs
+* Update MemoryConverter to handle complex result mapping
+* More robust handling of sample rate to account for interleaving and downsampling
+* Add support for multiple sample rates to CW test generator
+* "App" now selectable before connecting to instrument (selectable FFT size and number of channels).
+
+###New Features
+
+* Support for downsampling feature (on supported models)
+* Added ability to enable/disable data HDF5 logging for performance  
+* 
+
+###SpectroCore Versions Supported
+
+* SpectroCore v1.1.231
+
+###Bug Fixes
+
+* None
+
+
+
 ##Version 1.1
 
 ###Description

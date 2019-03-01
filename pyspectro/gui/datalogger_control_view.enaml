@@ -1,0 +1,31 @@
+#------------------------------------------------------------------------------
+# Copyright (c) 2016-2019, DSPlogic, Inc.  All Rights Reserved.  
+# 
+# RESTRICTED RIGHTS
+# Use of this software is permitted only with a software license agreement.
+#
+# Details of the software license agreement are in the file LICENSE.txt, 
+# distributed with this software.
+#------------------------------------------------------------------------------
+
+from enaml.widgets.api import Container, Label, RadioButton, Form, SpinBox, CheckBox, Slider, GroupBox, ActionGroup, RadioButton
+
+from enaml.stdlib.fields import FloatField
+from enaml.stdlib.slider_transform import FloatTransform
+
+enamldef DataLoggerControlView(Container):
+    # Note: RadioButton widgets are exclusive amongst sibilings
+    attr model
+    
+    Form:
+    
+        CheckBox: cont:
+            text      = 'Enable data logging'
+            checked << model.enable_data_logging
+            enabled << model.core_state in ('idle',  'disconnected')   # Prevent from changing during an acquisiton
+            toggled::
+                model.enable_data_logging = checked
+                    
+            
+
+                

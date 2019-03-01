@@ -33,7 +33,7 @@ def plot_waterfall(rawfftdata , numAverages, msrmnt_idx):
     
     #: Convert units
     fft_fs = convert_raw_to_fs(rawfftdata, numAverages[0])
-    fft_dbfs = convert_fs_to_dbfs(fft_fs)
+    fft_dbfs = convert_fs_to_dbfs(fft_fs, complexData = False)
 
     fig = plt.figure()
     ax = fig.gca(projection='3d')
@@ -48,17 +48,29 @@ def plot_waterfall(rawfftdata , numAverages, msrmnt_idx):
 
 
 
-def plot_raw_data(rawfftdata, numAverages):
-    Fs = 2.0e9 #: Sample Rate
-    fft_fs = convert_raw_to_fs(rawfftdata, numAverages)
-    fft_dbfs = convert_fs_to_dbfs(fft_fs)
+def plot_raw_data(rawfftdata, numAverages, complexData = False, Fs = 2.0e9):
     
-    """ This is a utility function used to plot data """    
-    #: Compute frequency axis
-    Nfft = 2*fft_dbfs.size
-    f = np.arange(Nfft/2, dtype=np.float )
+    fft_fs = convert_raw_to_fs(rawfftdata, numAverages, complexData)
+    fft_dbfs = convert_fs_to_dbfs(fft_fs, complexData)
+    
+    """ This is a utility function used to plot data """
+    
+    if complexData:
+        Nfft =   rawfftdata.size
+        fidx = np.arange(Nfft, dtype=np.float ) - Nfft/2
+    else:
+        # for real FFTs, only half the spectrum is transferred
+        Nfft = 2*rawfftdata.size
+        fidx = np.arange(Nfft/2, dtype=np.float )
+
     df = Fs / 2.0 / Nfft/2
-    f = f * df
+    f = fidx * df
+            
+    #: Compute frequency axis
+    #Nfft = 2*fft_dbfs.size
+    #f = np.arange(Nfft/2, dtype=np.float )
+    #df = Fs / 2.0 / Nfft/2
+    #f = f * df
     
     #: Plot data
     fig = plt.figure()

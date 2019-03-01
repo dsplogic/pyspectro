@@ -31,7 +31,7 @@ class Test(unittest.TestCase):
         
         import pyspectro.apps
         
-        self.core = PySpectroCore(pyspectro.apps.get_application(32768))
+        self.core = PySpectroCore(pyspectro.apps.get_application(4096))
         
         self.core.on_state_change= on_state_change
 

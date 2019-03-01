@@ -1,5 +1,5 @@
 #------------------------------------------------------------------------------
-# Copyright (c) 2016, DSPlogic, Inc.  All Rights Reserved.  
+# Copyright (c) 2016-2019, DSPlogic, Inc.  All Rights Reserved.  
 # 
 # RESTRICTED RIGHTS
 # Use of this software is permitted only with a software license agreement.
@@ -18,8 +18,20 @@ import numpy as np
 
 #: Create a memory converter object to pre-compute index map
 from pyspectro.drivers.Spectrometer import MemoryConverter
-mc = MemoryConverter(32768)
 
-#: Save to file
-np.savetxt("idx_ddra.txt", mc._ddra_indices, fmt = '%i', delimiter=",") 
-np.savetxt("idx_ddrb.txt", mc._ddrb_indices, fmt = '%i',delimiter=",") 
+mc = MemoryConverter(32768, False)
+np.savetxt("memidx_n32k_real_ddra.txt", mc._ddra_indices, fmt = '%i', delimiter=",") 
+np.savetxt("memidx_n32k_real_ddrb.txt", mc._ddrb_indices, fmt = '%i',delimiter=",") 
+
+mc = MemoryConverter(16384, True)
+np.savetxt("memidx_n16k_complex_ddra.txt", mc._ddra_indices, fmt = '%i', delimiter=",") 
+np.savetxt("memidx_n16k_complex_ddrb.txt", mc._ddrb_indices, fmt = '%i',delimiter=",") 
+
+mc = MemoryConverter(8192, True)
+np.savetxt("memidx_n8k_complex_ddra.txt", mc._ddra_indices, fmt = '%i', delimiter=",") 
+np.savetxt("memidx_n8k_complex_ddrb.txt", mc._ddrb_indices, fmt = '%i',delimiter=",") 
+
+mc = MemoryConverter(4096, True)
+np.savetxt("memidx_n4k_complex_ddra.txt", mc._ddra_indices, fmt = '%i', delimiter=",") 
+np.savetxt("memidx_n4k_complex_ddrb.txt", mc._ddrb_indices, fmt = '%i',delimiter=",") 
+
