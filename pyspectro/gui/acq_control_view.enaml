@@ -8,7 +8,7 @@
 # distributed with this software.
 #------------------------------------------------------------------------------
 
-from enaml.widgets.api import Container, Label, RadioButton, Form, SpinBox, CheckBox, Slider, GroupBox, ActionGroup, RadioButton
+from enaml.widgets.api import Container, Label, RadioButton, Form, SpinBox, CheckBox, Slider, GroupBox, ActionGroup, RadioButton, ObjectCombo
 
 from enaml.stdlib.fields import FloatField
 from enaml.stdlib.slider_transform import FloatTransform
@@ -22,35 +22,42 @@ enamldef AcquisitionControlView(Container):
         title_align << 'left'
     
         Form:
-            Label:
-                text = "Duration (sec)"
-        
-            FloatField:
-                value <<  32768.0/2.0e9 * model.numAverages
-                converter = lambda x: ('%.3f' % x)
-                value ::
-                    model.numAverages = int(round(value * ( 2.0e9 / 32768.0 )))
-    
+
             Label:
                 text = "Number of averages"
                 
             SpinBox: sbox:
-                maximum = 3662109  #: 60 sec
-                minimum = 6103     #: 0.1 sec
-                single_step = 1000
+                maximum = 2**22    #: 60 sec
+                minimum = 1024     #: 0.1 sec
+                single_step = 1024
                 value := model.numAverages
-                            
+        
+        
             Label:
-                text = ''
+                text = "Duration (sec)"
+
+            Label:
+                text << '{}'.format(float(model.Nfft) / model.SampleRate * model.numAverages)
                 
-            Slider:
-                FloatTransform:
-                    value << 32768.0/2.0e9 * model.numAverages
-                    minimum = 0.1
-                    maximum = 60.0
-                    precision = 200
-                    value ::
-                        model.numAverages = int(round(value * ( 2.0e9 / 32768.0 )))
+                        
+            # FloatField:
+            #     value <<  float(model.Nfft) / model.SampleRate * model.numAverages
+            #     converter = lambda x: ('%.3f' % x)
+            #     value ::
+            #         model.numAverages = int(round(value * ( model.SampleRate  / float(model.Nfft) )))
+    
+                            
+            #Label:
+            #    text = ''
+            #    
+            # Slider:
+            #     FloatTransform:
+            #         value << float(model.Nfft) / model.SampleRate * model.numAverages
+            #         minimum = 0.05
+            #         maximum = 60.0
+            #         precision = 200
+            #         value ::
+            #             model.numAverages = int(round(value * ( model.SampleRate / float(model.Nfft) )))
                     
     GroupBox : 
         title << "Algorithm"
@@ -66,6 +73,15 @@ enamldef AcquisitionControlView(Container):
             text      = 'FFT'
             clicked ::
                 model.disablePolyphase = True
-            
 
-                
+    Form:
+    
+        Label:
+            text = "Downsample ratio"
+
+        ObjectCombo: downsample_ratio :
+            items = [1,2]
+            selected ::
+
+                model.downsample_ratio = change['value']
+

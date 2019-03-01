@@ -47,11 +47,18 @@ enamldef PsToolBar(ToolBar):
         items = [32768,16384,8192,4096]
         enabled << model.core_state == 'disconnected' 
                 
+    Label:
+        text = '  Channels  '
+
+    ObjectCombo: app_channels :
+        items = [1,2]
+        enabled << model.core_state == 'disconnected' 
+
     Action: connectButton:
         text = 'Connect'
         enabled << model.core_state == 'disconnected' 
         triggered ::
-            model.connect(app_nfft.selected)
+            model.connect(app_nfft.selected, app_channels.selected)
 
     Action: disConnectButton:
         text = 'Disconnect'

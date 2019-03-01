@@ -1,10 +1,10 @@
 #------------------------------------------------------------------------------
-# Copyright (c) 2016, DSPlogic, Inc.  All Rights Reserved.  
-# 
+# Copyright (c) 2016-2019, DSPlogic, Inc.  All Rights Reserved.  
+#
 # RESTRICTED RIGHTS
 # Use of this software is permitted only with a software license agreement.
 #
-# Details of the software license agreement are in the file LICENSE.txt, 
+# Details of the software license agreement are in the file LICENSE.txt,
 # distributed with this software.
 #------------------------------------------------------------------------------
 from __future__ import (division, print_function, absolute_import)
@@ -21,7 +21,7 @@ from enaml.stdlib.fields import FloatField
 from enaml.stdlib.slider_transform import FloatTransform
 
 from pyspectro.gui.cwtest_model import CwTestModel
- 
+
 enamldef CwTestView(Container):
 
     attr cwTestModel : CwTestModel
@@ -35,24 +35,20 @@ enamldef CwTestView(Container):
             if checked:
                 cwTestModel.applyTestFreq(f_center + f_offset)
             cwTestModel.testMode = checked
-            
-    # FloatField:
-    #     value :=  cwTestModel.testFreq
-    #     converter = lambda x: ('%g' % x)
 
     Form:
         Label:
             text = 'Center Frequency (Hz)'
-            
+
         FloatField :
             value := f_center
             value :: timer.start()
             minimum = 0.0
             maximum = float(1e9)
-            
+
         Label:
             text = 'Offset (Hz)'
-    
+
         SpinBox: sbox:
             maximum = 100000
             minimum = -100000
@@ -60,14 +56,11 @@ enamldef CwTestView(Container):
             value := f_offset
             value :: timer.start()
             hug_width = 'strong'
-        
+
 
     #value :: timer.start()
     Timer: timer:
         interval = 350
         single_shot = True
-        timeout :: 
+        timeout ::
             cwTestModel.applyTestFreq(f_center + f_offset)
-
-            
-            

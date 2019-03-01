@@ -1,10 +1,10 @@
 #------------------------------------------------------------------------------
-# Copyright (c) 2016, DSPlogic, Inc.  All Rights Reserved.  
-# 
+# Copyright (c) 2016-2019, DSPlogic, Inc.  All Rights Reserved.  
+#
 # RESTRICTED RIGHTS
 # Use of this software is permitted only with a software license agreement.
 #
-# Details of the software license agreement are in the file LICENSE.txt, 
+# Details of the software license agreement are in the file LICENSE.txt,
 # distributed with this software.
 #------------------------------------------------------------------------------
 
@@ -53,15 +53,8 @@ ffts.stopProcessing()
 data_ddra    = ffts.read_memory(1)
 data_ddrb    = ffts.read_memory(2)
 
-#: Convert data into FFT format        
-rawfftdata = MemoryConverter(ffts.Nfft).process(data_ddra, data_ddrb)
+#: Convert data into FFT format
+rawfftdata = MemoryConverter(ffts.app.Nfft, ffts.app.complexData ).process(data_ddra, data_ddrb)
 
-#: Plot result        
+#: Plot result
 plot_raw_data(rawfftdata, ffts.numAverages)
-
-
-
-
-
-
-

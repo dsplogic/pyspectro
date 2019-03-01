@@ -19,7 +19,6 @@ class CwTestModel(Atom):
     
     #: Test settings
     testMode = Bool()
-    #testFreq = Float()
 
     def __init__(self, device):
         """ Initialize 
@@ -40,14 +39,3 @@ class CwTestModel(Atom):
         with self.device.lock:
             self.device._testFreq = value #:self.testFreq
         
-#     @observe('testFreq')
-#     def _testFreqHandler(self, change):
-#         
-#         self.device._testFreq = change['value']
-
-    # def destroy(self):
-    #     """ A reimplemented destructor.
-    # 
-    #     """
-    #     super(DeviceParameterModel, self).destroy()
-    #     del self.comif

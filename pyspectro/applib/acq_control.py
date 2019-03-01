@@ -1,5 +1,5 @@
 #------------------------------------------------------------------------------
-# Copyright (c) 2016, DSPlogic, Inc.  All Rights Reserved.  
+# Copyright (c) 2016-2019, DSPlogic, Inc.  All Rights Reserved.  
 # 
 # RESTRICTED RIGHTS
 # Use of this software is permitted only with a software license agreement.
@@ -61,6 +61,11 @@ class AcquisitionDataBuffer(Atom):
     fftdata      = Value()
     stats        = Typed(AcquisitionStats)
 
+    #: TODO: Consider removing these values form buffer if not needed.
+    Nfft         = Value()
+    complexData  = Value()
+
+
     def clear(self):
         #self.data_ddra   = None
         #self.data_ddrb   = None
@@ -120,7 +125,7 @@ class AcquisitionControlInterface(Atom):
         
         Parameters
         ----------
-        driver : UHSFFTS_32k
+        driver : SpectrometerApplication
             The driver object must be initialized and connected before creating this
             worker thread object.  
             
@@ -134,11 +139,16 @@ class AcquisitionControlInterface(Atom):
             
         """
         
+        #super(self, AcquisitionControlInterface).__init__()
+        
         self._device = driver
-        
+
         #: Initialize memory converter
-        self._converter = MemoryConverter(driver.Nfft)
+        self._converter = MemoryConverter(driver.app.Nfft, driver.app.complexData)
         
+        self.buffer.Nfft = driver.app.Nfft
+        self.buffer.complexData = driver.app.complexData
+    
         #: Set buffer to initially available state
         self.buffer_release.set()
     
@@ -197,7 +207,7 @@ class AcquisitionControlInterface(Atom):
         return cmd
 
     def update_buffer(self):
-        """ Update acquisiton buffer with data from memory
+        """ Update acquisiton buffer with SpectroCore data
         
         """
         

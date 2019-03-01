@@ -8,9 +8,10 @@
 # distributed with this software.
 #------------------------------------------------------------------------------
 
-from atom.api import Atom, Value, Bool, Property, Int, Tuple, Enum
+from atom.api import Atom, Value, Bool, Property, Int, Tuple, Enum, Float
 
 import matplotlib.pyplot as plt
+import numpy as np
 
 import logging
 logger = logging.getLogger(__name__)
@@ -177,46 +178,81 @@ from pyspectro.applib.processing import convert_raw_to_fs, convert_fs_to_dbfs, c
 
 class SpectrumFigure(MplFigure):
     
-    numAverages   = Int()
+    Nfft          = Int(32768)
+    
+    complexData   = Bool(False)
+    
+    sampleRate    = Float(2.0e9)
+
+    numAverages   = Int(1024)
     
     units         = Enum( 'dBm', 'dB-FS', 'FS') #, 'mW'
     
     voltageRange  = Enum(1.0, 2.0)
+    
     
     def __init__(self, *args, **kwargs):
         
         super(SpectrumFigure, self).__init__(*args, **kwargs)
         
         self.xlabel = 'Frequency (MHz)'
+        
         self.update_ylabel()
         
-        self.xrange = (0, 1000)
+        self.update_xrange()
+        
         self.yrange = (-110, 10)
+        
+        self.ax.grid(True)
 
     def update_ylabel(self):
-        self.ylabel = 'RMS Power (%s)' % self.units
         
+        self.ylabel = 'Power (%s)' % self.units
+        
+    def update_xrange(self):
+        """ Set frequency range (in MHz)
+        
+        """
+        
+        if self.complexData:
+            
+            self.xdata = self.sampleRate * (np.arange(self.Nfft) - self.Nfft/2.0)/ float(self.Nfft) / 1.0e6    
+            
+            self.xrange = (-self.sampleRate/2.0/1.0e6, +self.sampleRate/2.0/1.0e6)
+         
+            
+        else:
+            
+            self.xdata = self.sampleRate * np.arange(self.Nfft/2.0) / float(self.Nfft) / 1.0e6    
+            
+            self.xrange = (0, self.sampleRate/2.0/1.0e6)
+
     
     def format_data(self):
         
         ydata = self.ydata
         
-        fft_fs = convert_raw_to_fs(ydata, self.numAverages)
+        fft_fs = convert_raw_to_fs(ydata, self.numAverages, self.complexData)
         
         if self.units == 'FS':
             return self.xdata, fft_fs
         
         elif self.units == 'dB-FS': 
-            fft_dbfs = convert_fs_to_dbfs(fft_fs, self.voltageRange)
+            fft_dbfs = convert_fs_to_dbfs(fft_fs, self.complexData)
             return self.xdata, fft_dbfs
         
         elif self.units == 'dBm': 
-            fft_dbfs = convert_fs_to_dBm(fft_fs, self.voltageRange)
+            fft_dbfs = convert_fs_to_dBm(fft_fs, self.complexData, self.voltageRange)
             return self.xdata, fft_dbfs
         
         else:
             raise Exception('Units not yet supported')
 
     
-        
 
+if __name__ == "__main__":
+
+    sf = SpectrumFigure(numAverages = 4)
+    plt.show()
+    
+    

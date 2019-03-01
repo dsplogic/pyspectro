@@ -81,6 +81,10 @@ enamldef MonitorView(Container):
                 text = "Nfft"
             Label:
                 text << '{}'.format(model.Nfft)
+            Label:
+                text = "Downsample Ratio"
+            Label:
+                text << '{}'.format(model.downsample_ratio)
 
                 
 

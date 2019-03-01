@@ -60,6 +60,7 @@ def handle_heartbeat_task_result(model, result):
     
     model.SampleRate = result['SampleRate']
     model.Nfft = result['Nfft']
+    model.downsample_ratio = result['downsample_ratio']
     
     #: The following are manually applied
     #model.inputSettings.voltageOffset = result['Ch1_Offset']
@@ -79,6 +80,7 @@ def heartbeat_task(model):
         result       = get_slow_properties(model.core.device)
         temperatures = get_temperature_properties(model.core.device)
         result.update( temperatures )
+        
         
     deferred_call(handle_heartbeat_task_result, model, result)
         
@@ -129,6 +131,8 @@ class SpectroModel(Atom):
     
     SampleRate   = Float()
     
+    complexData = Bool()
+    
     interleaved  = Bool()
     
     inputSettings = Typed(InputSetting, ())
@@ -139,6 +143,9 @@ class SpectroModel(Atom):
 
     refresh_timer = Typed(TimedProcessor) 
     
+    enable_data_logging = Bool(False)
+    
+    downsample_ratio = Int(1)
     
     core = Typed(PySpectroCore)
     core_state         = Enum('disconnected','connecting','idle','acq_start','acquiring','acq_done')
@@ -217,30 +224,36 @@ class SpectroModel(Atom):
     def _disablePolyphase_handler(self, change):
         with self.core.device.lock:
             self.core.device.disablePolyphase = change['value']        
-        
-#     @observe('acquisitionComplete')
-#     def _acq_complete_handler(self, event):
-#          
-#         with self.processLock:
-#              
-#             app = Application.instance()
-#             pending = app._qapp.hasPendingEvents()
-#       
-#             logger.info('Acq handler: Qapp pending events=%s' % pending)
-#       
-# 
-#             logger.info('Processing acquired data.')
-#             #print('Processing acquired data. Heap depth=%s' % len(app._task_heap))
-#             #print('event %s' % event)
-#             
-#             self.spectrumFigure.ax.grid(True)
-#             
-#             self.spectrumFigure.ydata = self.acquisitionResult.fftdata
-#             
-#             self.spectrumFigure.redraw()
-#     
-#             #hasPendingEvents()
 
+    @observe('enable_data_logging')
+    def _enable_data_logging_handler(self, change):
+        """ This event is restricted to happening when device is idle or disconnected 
+        
+        """
+        with self.core.device.lock:
+            self.core.enable_data_logging = change['value']        
+
+    @observe('downsample_ratio')
+    def _downsample_ratio_handler(self, change):
+
+        with self.core.device.lock:
+            
+            if change['value'] == 1:
+                
+                self.core.device.downsample_ratio = 1
+                
+            elif change['value'] == 2:
+
+                self.core.device.downsample_ratio = 2
+
+            else:
+                logger.warning('Invalid demiation ratio selected: {}'.format(change['value']))
+        
+        #: Update model and spectrometer plot with sample rate from Spectrometer
+        self.SampleRate = self.core.device.sampleRate
+        self.spectrumFigure.sampleRate = self.SampleRate
+        self.spectrumFigure.update_xrange()
+                
     def _on_core_state_change(self, state):
         """ State change callback 
         
@@ -317,8 +330,14 @@ class SpectroModel(Atom):
                 #: Get properties from device
                 self.refreshProperties()
 
-                #: Readback Fs and plot axis
-                self._init_frequency_axis()
+                #: Initialize spectrumFigure and update X axis
+                self.spectrumFigure.numAverages = self.numAverages
+                self.spectrumFigure.sampleRate = self.SampleRate
+                self.spectrumFigure.Nfft = self.Nfft
+                self.spectrumFigure.complexData = self.complexData
+                self.spectrumFigure.sampleRate = self.SampleRate
+                
+                self.spectrumFigure.update_xrange()
                  
                 self.cwTestModel = CwTestModel(self.core.device)
                 
@@ -369,16 +388,6 @@ class SpectroModel(Atom):
             raise Exception('Unknown state {0}'.format(newval))
 
 
-            
-    def _init_frequency_axis(self):
-
-        f = np.arange(16384.0, dtype=np.float )
-        df = self.SampleRate / 2.0 / 16384.0
-        f = f * df
-        f = f / 1e6
-        self.spectrumFigure.xrange = (0, np.max(f))
-        self.spectrumFigure.xdata = f
-            
                             
     def startAcquisition(self):
         """ Start acquisitionn (one-shot or continuous mode)
@@ -392,6 +401,7 @@ class SpectroModel(Atom):
             self.core.device.numAverages = self.numAverages
             
         self.spectrumFigure.numAverages = self.numAverages
+        self.spectrumFigure.sampleRate = self.SampleRate
         
         #: If one-shopt acquisition, request display of next measurement
         #: Otherwise, rely on GUI timer to update measurement
@@ -450,17 +460,18 @@ class SpectroModel(Atom):
         #logger.debug("Nmsr_total %s.  Missed: %s" % (result.Nmsr_ok, result.Nmsr_drop))  
  
         #: Don't fetch/process data if refresh is disabled
-        if self.spectrumFigure.disableRefresh:
             
-            return
- 
         #: If prior processing is completed, initiate another event
         if self.processLock.acquire(False):
             
             try: 
-                #: Post event to Qt main event loop
-                deferred_call(self.process_data_in_gui, result )  
-                                                    
+                if not self.spectrumFigure.disableRefresh:
+                    #: Post event to Qt main event loop
+                    deferred_call(self.process_data_in_gui, result )
+                    
+                else:    
+                    deferred_call(self.process_stats_only_in_gui, result)      
+                    
             finally:            
                 
                 self.processLock.release()
@@ -483,8 +494,11 @@ class SpectroModel(Atom):
         logger.debug('Pending events: = %s' % app._qapp.hasPendingEvents())
 
         with self.processLock:
-             
+            
+            #: Update figure properties from model
+            self.spectrumFigure.numAverages = self.numAverages
             self.spectrumFigure.voltageRange = self.inputSettings.voltageRange
+            
             self.spectrumFigure.ax.grid(True)
             self.spectrumFigure.ydata = result.fftdata
             self.spectrumFigure.redraw()
@@ -492,6 +506,21 @@ class SpectroModel(Atom):
             self.nMeasurements = result.stats.Nmsr_total
             self.nDropped      = result.stats.Nmsr_drop
             self.nBlocked      = result.stats.Nmsr_blocked
+
+    def process_stats_only_in_gui(self, result):
+        """ Update stats
+        
+        Update data statistics the main GUI thread.  Use when plot refresh is disabled  
+        Should only be called using deferred_call
+        """
+
+        with self.processLock:
+            
+            #: Update figure properties from model
+            self.nMeasurements = result.stats.Nmsr_total
+            self.nDropped      = result.stats.Nmsr_drop
+            self.nBlocked      = result.stats.Nmsr_blocked
+
 
     def setContinuousMode(self, value):
 
@@ -509,14 +538,23 @@ class SpectroModel(Atom):
                 self.acquisitionMode = 'One-shot'
 
 
-    def connect(self, app_Nfft):
+    def connect(self, app_Nfft, channels):
         """ Initiate a connection
+        
+        Parameters
+        ----------
+        app_Nfft : int
+            FFT Size
+            
+        channels : int
+            1 : Single channel, real FFT  (interleaving on)
+            2 : Two channels, complex FFT (interleaving off)
         
         """
         #: Get application to load into spectrometer
         logger.info('Requested FFT Size: {}'.format(app_Nfft))
             
-        app = pyspectro.apps.get_application(app_Nfft)
+        app = pyspectro.apps.get_application(app_Nfft, channels)
         
         if not app:
             
@@ -582,6 +620,10 @@ class SpectroModel(Atom):
                 self.core.device.instrument.Channels['Channel1'].Range = self.inputSettings.voltageRange
                 self.core.device.instrument.Channels['Channel1'].Filter.Bypass = self.inputSettings.FilterBypass 
 
+                self.core.device.instrument.Channels['Channel2'].Offset = self.inputSettings.voltageOffset 
+                self.core.device.instrument.Channels['Channel2'].Range = self.inputSettings.voltageRange
+                self.core.device.instrument.Channels['Channel2'].Filter.Bypass = self.inputSettings.FilterBypass 
+
                 self.core.device.instrument.Acquisition.ApplySetup()
             
         else:
@@ -595,11 +637,17 @@ class SpectroModel(Atom):
             with self.core.device.lock:
                  
                 self.Nfft         = self.core.device.Nfft
-                self.SampleRate   = self.core.device.instrument.Acquisition.SampleRate
                 self.interleaved  = self.core.device.interleaving
+                self.complexData  = self.core.device.app.complexData
+                self.SampleRate   = self.core.device.sampleRate
+                
                 self.inputSettings.voltageOffset = self.core.device.instrument.Channels['Channel1'].Offset
                 self.inputSettings.voltageRange  = self.core.device.instrument.Channels['Channel1'].Range
                 self.inputSettings.FilterBypass  = self.core.device.instrument.Channels['Channel1'].Filter.Bypass
+
+                self.inputSettings.voltageOffset = self.core.device.instrument.Channels['Channel2'].Offset
+                self.inputSettings.voltageRange  = self.core.device.instrument.Channels['Channel2'].Range
+                self.inputSettings.FilterBypass  = self.core.device.instrument.Channels['Channel2'].Filter.Bypass
  
         else:
              
