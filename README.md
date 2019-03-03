@@ -1,8 +1,8 @@
 # PySpectro Release Notes
 
-##Version 1.2
+## Version 1.2
 
-###Description
+### Description
 
 This major update adds support for multiple FFT sizes and complex input data, including:
 
@@ -12,20 +12,20 @@ This major update adds support for multiple FFT sizes and complex input data, in
 * Add support for multiple sample rates to CW test generator
 * App now selectable before connecting to instrument (selectable FFT size and number of channels).
 
-###New Features
+### New Features
 
 * Support for downsampling feature (on supported models)
 * Added ability to enable/disable data HDF5 logging for performance  
 
-###Bug Fixes
+### Bug Fixes
 
 * None
 
 
 
-##Version 1.1
+## Version 1.1
 
-###Description
+### Description
 
 * Added several new code demonsrations for programattically 
    interacting with the spectrometer driver and the core application.
@@ -39,27 +39,27 @@ This major update adds support for multiple FFT sizes and complex input data, in
 * Added licensing support for new SpectroCore v1.1. 
 * Removed deprecated user guide.
 
-###SpectroCore Versions Supported
+### SpectroCore Versions Supported
 
 * SpectroCore v1.1.231
 
-###Bug Fixes and improvements
+### Bug Fixes and improvements
 
 * Improved thread lock effciency in acquisition controller
 
 
-##Version 1.0.1
+## Version 1.0.1
 
-###Description: 
+### Description: 
 
 This release includes an updated user guide that describes the 
 Anaconda-based installation process.
 
-###SpectroCore Versions Supported
+### SpectroCore Versions Supported
 
 * SpectroCore v1.0.229
 
-###Bug Fixes
+### Bug Fixes
 
 * Use python2.7 compliant package name for Queue
 * Fix a crash that occurs if drivers are not installed
@@ -69,7 +69,7 @@ Anaconda-based installation process.
 
 
 
-##Version 1.0
+## Version 1.0
 
 Initial Release
 
