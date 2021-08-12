@@ -1,12 +1,12 @@
-#------------------------------------------------------------------------------
-# Copyright (c) 2016-2019, DSPlogic, Inc.  All Rights Reserved.  
+# ------------------------------------------------------------------------------
+# Copyright (c) 2016-2021, DSPlogic, Inc.  All Rights Reserved.  
 #
 # RESTRICTED RIGHTS
 # Use of this software is permitted only with a software license agreement.
 #
 # Details of the software license agreement are in the file LICENSE.txt,
 # distributed with this software.
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 from __future__ import (division, print_function, absolute_import)
 
 """
@@ -108,6 +108,16 @@ def get_instrument_properties(device):
 
     result['license_ok']                    = getattr(device, 'license_ok', None)
 
+    device_id_hi = device.logicDevice['DpuA'].ReadRegisterInt32(0x341c)
+    device_id_lo = device.logicDevice['DpuA'].ReadRegisterInt32(0x3418)
+    device_id_hi &= 0xffffffff  #: Convert to unsigned int
+    device_id_lo &= 0xffffffff  #: Convert to unsigned int
+    result['device_id_1']                     = '{0:X}_{1:X}'.format(device_id_hi, device_id_lo)
+    device_id_hi = device.logicDevice['DpuA'].ReadRegisterInt32(0x343c)
+    device_id_lo = device.logicDevice['DpuA'].ReadRegisterInt32(0x3438)
+    device_id_hi &= 0xffffffff  #: Convert to unsigned int
+    device_id_lo &= 0xffffffff  #: Convert to unsigned int
+    result['device_id_2']                     = '{0:X}_{1:X}'.format(device_id_hi, device_id_lo)
 
     return result
 
@@ -126,6 +136,9 @@ def get_instrument_properties_string(device):
     result.append('Driver:')
     result.append('  {0}: {1}'.format('ID' ,        prop['Driver_Identifier']))
     result.append('  {0}: {1}'.format('Revision' ,        prop['Driver_Revision']))
+    result.append('Device:')
+    result.append('  1 {0}'.format(prop['device_id_1']))
+    result.append('  2 {0}'.format(prop['device_id_2']))
     result.append('License OK: {0}'.format(prop['license_ok']))
 
     return '\n'.join(result)

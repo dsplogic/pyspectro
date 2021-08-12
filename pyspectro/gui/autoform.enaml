@@ -1,11 +1,11 @@
 # This file enaml example code
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Copyright (c) 2013, Nucleic Development Team.
 #
 # Distributed under the terms of the Modified BSD License.
 #
 # The full license is in the file COPYING.txt, distributed with this software.
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 from __future__ import (division, print_function, absolute_import)
 
 """ An advanced example of Enaml templates.
@@ -31,9 +31,9 @@ from pyspectro.common.parameters import _isParameter
 
 
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # "Libaray" Definitions
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # The templates and enamldefs defined in this section are ones which can
 # be written once and then used as a library. They are more-or-less fully
 # generic and will work for a large swath of models.
@@ -240,9 +240,9 @@ enamldef AutoForm(Form):
         args = (type(model),)
 
 
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Main Models and Views
-#------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 class FooModel(Atom):
     spam = Int(34)
     ham = Int(42)

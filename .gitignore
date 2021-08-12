@@ -1,4 +1,5 @@
 .project
+.idea
 .pydevproject
 *.pyc
 *__enamlcache__
