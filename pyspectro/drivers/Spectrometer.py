@@ -69,7 +69,7 @@ class SpectrometerApplication(Atom):
 
     floating_point = Bool()
 
-    downsample_ratio = List(item = int)
+    downsample_ratio = List(item=int)
 
 
 class Spectrometer(Digitizer):
