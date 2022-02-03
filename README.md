@@ -1,3 +1,18 @@
+
+# Installation
+
+Ensure that Python 3.8 is installed.
+
+Create a new Virtual environment.
+
+    python -m venv venv
+
+After activating the virtual environment, install the prerequisites
+
+    pip install -r requirements.txt
+
+Install 
+
 # PySpectro Release Notes
 
 ## Version 1.2

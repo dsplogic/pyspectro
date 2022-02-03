@@ -1,4 +1,4 @@
-# ------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Copyright (c) 2016-2021, DSPlogic, Inc.  All Rights Reserved.  
 # 
 # RESTRICTED RIGHTS
@@ -6,7 +6,7 @@
 #
 # Details of the software license agreement are in the file LICENSE.txt, 
 # distributed with this software.
-# ------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 from atom.api import Atom, Value, Bool, Property, Int, Tuple, Enum, Float
 
@@ -63,7 +63,8 @@ class MplFigure(Atom):
         fig, ax = plt.subplots()
         self.figure = fig
         self.ax = ax
-        self.line,     = ax.plot([],[], picker= 5)
+        self.line,     = ax.plot([],[])
+        self.line.set_pickradius(5)
         self.selected, = ax.plot([], [], 'o', ms=5, alpha=0.9,
                                  color='yellow', visible=False)
 

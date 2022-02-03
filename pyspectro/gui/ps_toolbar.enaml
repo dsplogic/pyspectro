@@ -1,4 +1,4 @@
-# ------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Copyright (c) 2016-2021, DSPlogic, Inc.  All Rights Reserved.
 # 
 # RESTRICTED RIGHTS
@@ -6,19 +6,15 @@
 #
 # Details of the software license agreement are in the file LICENSE.txt, 
 # distributed with this software.
-# ------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
-from enaml.widgets.api import  ToolBar,  Action, ActionGroup, Menu, PopupView
+from enaml.widgets.api import  ToolBar
+from enaml.widgets.api import  Label
+from enaml.widgets.api import  Field
+from enaml.widgets.api import  ObjectCombo
+from enaml.widgets.api import  Action
 
-from enaml.widgets.api import  Form, Field, PushButton, Label, Slider, ComboBox, SpinBox, Container, ObjectCombo
-from enaml.layout.api import spacer
 
-from enaml.icon import Icon, IconImage
-from enaml.image import Image
-
-from pyspectro.gui.icons import connectedIcon
-from enaml.core.api import Include
-            
             
 enamldef PsToolBar(ToolBar):
  

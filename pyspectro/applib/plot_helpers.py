@@ -1,4 +1,4 @@
-# ------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Copyright (c) 2016-2021, DSPlogic, Inc.  All Rights Reserved.  
 # 
 # RESTRICTED RIGHTS
@@ -6,7 +6,7 @@
 #
 # Details of the software license agreement are in the file LICENSE.txt, 
 # distributed with this software.
-# ------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 """ Demonstration helpers for plotting fft results  
 
@@ -32,7 +32,7 @@ def plot_waterfall(rawfftdata , numAverages, msrmnt_idx):
     f = f * df
     
     #: Convert units
-    fft_fs = convert_raw_to_fs(rawfftdata, numAverages[0])
+    fft_fs = convert_raw_to_fs(rawfftdata, numAverages[0],complexData=False)
     fft_dbfs = convert_fs_to_dbfs(fft_fs, complexData = False)
 
     fig = plt.figure()

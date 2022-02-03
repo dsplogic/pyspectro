@@ -1,4 +1,4 @@
-# ------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Copyright (c) 2016-2021, DSPlogic, Inc.  All Rights Reserved.  
 # 
 # RESTRICTED RIGHTS
@@ -6,16 +6,15 @@
 #
 # Details of the software license agreement are in the file LICENSE.txt, 
 # distributed with this software.
-# ------------------------------------------------------------------------------
-from __future__ import (division, print_function, absolute_import)
+# -----------------------------------------------------------------------------
 
 
-from atom.api import Atom, Unicode
+from atom.api import Atom, Str
 import sys
 
 class ConsoleTextWriter(Atom):
 
-    text = Unicode()
+    text = Str()
     
     def write(self, newtext):
         

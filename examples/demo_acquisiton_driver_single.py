@@ -1,4 +1,4 @@
-# ------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Copyright (c) 2016-2021, DSPlogic, Inc.  All Rights Reserved.  
 #
 # RESTRICTED RIGHTS
@@ -6,7 +6,7 @@
 #
 # Details of the software license agreement are in the file LICENSE.txt,
 # distributed with this software.
-# ------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 """ Single acquisiton example using only the Spectrometer Driver
 
@@ -16,7 +16,7 @@ a single acquisiton.
 """
 
 import logging
-from .plot_helpers import plot_raw_data
+from pyspectro.applib.plot_helpers import plot_raw_data
 from pyspectro.drivers.Spectrometer import MemoryConverter
 from pyspectro.apps import UHSFFTS_32k
 

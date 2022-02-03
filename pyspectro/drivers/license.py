@@ -1,4 +1,4 @@
-# ------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Copyright (c) 2016-2021, DSPlogic, Inc.  All Rights Reserved.  
 # 
 # RESTRICTED RIGHTS
@@ -6,10 +6,10 @@
 #
 # Details of the software license agreement are in the file LICENSE.txt, 
 # distributed with this software.
-# ------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
-from configparser import SafeConfigParser
+from configparser import ConfigParser
 import os
 import logging
 logger = logging.getLogger(__name__)
@@ -89,7 +89,7 @@ def read_license_keys(serial_no):
     err = ''
 
     #: Open License file and get parser object
-    parser = SafeConfigParser()
+    parser = ConfigParser()
     flist = parser.read(licfile);
     logger.info('License file found %s' % licfile)
     if len(flist) != 1:    

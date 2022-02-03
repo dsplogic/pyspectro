@@ -1,4 +1,4 @@
-# ------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Copyright (c) 2016-2021, DSPlogic, Inc.  All Rights Reserved.  
 # 
 # RESTRICTED RIGHTS
@@ -6,7 +6,7 @@
 #
 # Details of the software license agreement are in the file LICENSE.txt, 
 # distributed with this software.
-# ------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 from atom.api import Atom, Property, Value, Str, Bool, Typed
@@ -246,6 +246,8 @@ class AgMD2Device(Atom):
                 self.instrument.Initialize(self.resourceName, 0, 0, initstring)
     
             except Exception as e:
+                
+                # self.instrument = None
                 
                 logger.info('Connection attempt failed with error: %s ' % str(e))
                 

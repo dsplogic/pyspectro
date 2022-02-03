@@ -1,4 +1,4 @@
-# ------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Copyright (c) 2016-2021, DSPlogic, Inc.  All Rights Reserved.  
 # 
 # RESTRICTED RIGHTS
@@ -6,10 +6,10 @@
 #
 # Details of the software license agreement are in the file LICENSE.txt, 
 # distributed with this software.
-# ------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 from atom.api import Typed
-from atom.api import Atom, Value, Unicode, Tuple, Int, Dict, Callable
+from atom.api import Atom, Value, Str, Tuple, Int, Dict, Callable
 
 from pyspectro.common.parameters import ParameterModel, p_
 
@@ -323,11 +323,11 @@ class DeviceParameterContainerModel(DeviceParameterModel):
             
 class ComMethod(Atom):
     restype    = Value()  #: Typed(ctypes.HRESULT, PyCSimpleType)
-    methodname = Unicode()
+    methodname = Str()
     argtypes   = Tuple()
     paramflags = Tuple()
     idlflags   = Tuple()
-    helptext   = Unicode()
+    helptext   = Str()
     
 
 def getComMethods(comif):

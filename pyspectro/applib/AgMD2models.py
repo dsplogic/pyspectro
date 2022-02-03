@@ -1,4 +1,4 @@
-# ------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Copyright (c) 2016-2021, DSPlogic, Inc.  All Rights Reserved.  
 # 
 # RESTRICTED RIGHTS
@@ -6,7 +6,7 @@
 #
 # Details of the software license agreement are in the file LICENSE.txt, 
 # distributed with this software.
-# ------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 """ This module provides the data models used to represent a Digitizer.
 
@@ -16,11 +16,10 @@ device using the Digitizer driver.
 
 """
 
-from __future__ import (division, print_function, absolute_import)
 
 
  
-from atom.api import Atom, Bool, Unicode, Enum, Typed, Int, Float, Callable, Value, Dict
+from atom.api import Atom, Bool, Str, Enum, Typed, Int, Float, Callable, Value, Dict
 
 from pyspectro.common.parameters import p_, child_
 from pyspectro.common.comdevice import DeviceParameterModel, DeviceParameterContainerModel
@@ -42,7 +41,7 @@ class IAgMD2ChannelMultiRecordMeasurement(DeviceParameterModel):
 
 class IAgMD2Channel(DeviceParameterModel):
     
-    ConnectorName              = p_( Unicode() )
+    ConnectorName              = p_( Str() )
     Coupling                   = p_( Int() ) #Enum('AC', 'DC', 'GND')
     Enabled                    = p_( Bool() )
     InputConnectorSelection    = p_( Int() )
@@ -50,7 +49,7 @@ class IAgMD2Channel(DeviceParameterModel):
     Offset                     = p_( Float(), writable=True )
     Range                      = p_( Float(), writable=True )
     Temperature                = p_( Float() )
-    TimeInterleavedChannelList = p_( Unicode(), writable=True )
+    TimeInterleavedChannelList = p_( Str(), writable=True )
 
     Filter                 = child_( Value(factory= IAgMD2ChannelFilter) )
     Measurement            = child_( Value(factory= IAgMD2ChannelMeasurement) )
@@ -100,23 +99,23 @@ class IAgMD2Temperature(DeviceParameterModel):
     Units  = p_( Int() )
 
 class IIviDriverIdentity(DeviceParameterModel):
-    Description                = p_( Unicode() )
-    GroupCapabilities          = p_( Unicode() )
-    Identifier                 = p_( Unicode() )
-    InstrumentFirmwareRevision = p_( Unicode() )
-    InstrumentManufacturer     = p_( Unicode() )
-    InstrumentModel            = p_( Unicode() )
-    Revision                   = p_( Unicode() )
+    Description                = p_( Str() )
+    GroupCapabilities          = p_( Str() )
+    Identifier                 = p_( Str() )
+    InstrumentFirmwareRevision = p_( Str() )
+    InstrumentManufacturer     = p_( Str() )
+    InstrumentModel            = p_( Str() )
+    Revision                   = p_( Str() )
     SpecificationMajorVersion  = p_( Int() )
     SpecificationMinorVersion  = p_( Int() )
-    SupportedInstrumentModels  = p_( Unicode() )
-    Vendor                     = p_( Unicode() )
+    SupportedInstrumentModels  = p_( Str() )
+    Vendor                     = p_( Str() )
 
 class IAgMD2MonitoringValue(DeviceParameterModel):  
     CurrentValue  = p_( Float() )
     LimitHigh     = p_( Float() )
     LimitLow      = p_( Float() )
-    Unit          = p_( Unicode() )
+    Unit          = p_( Str() )
 
 
 class IAgMD2LogicDeviceMemoryBank(DeviceParameterModel):
@@ -157,10 +156,10 @@ class IAgMD2MonitoringValues(DeviceParameterContainerModel):
 
 class IAgMD2InstrumentInfo(DeviceParameterModel):  
     #ChassisNumber       = p_(Int())  #: Not supported on platform.  TODO: handle non-supported parameters
-    IOVersion           = p_(Unicode())
+    IOVersion           = p_(Str())
     NbrADCBits          = p_(Int())
-    Options             = p_(Unicode())
-    SerialNumberString  = p_( Unicode() )
+    Options             = p_(Str())
+    SerialNumberString  = p_( Str() )
     MonitoringValues    = child_(Value(factory = IAgMD2MonitoringValues) )
 
 class IAgMD2SampleClock(DeviceParameterModel):  
@@ -185,18 +184,18 @@ class IAgMD2Calibration(DeviceParameterModel):
     #:SelfCalibrate = m_(Value())
 
 class IAgMD2ControlIO(DeviceParameterModel):   
-    AvailableSignals   = p_(Unicode())
-    Signal             = p_(Unicode())
+    AvailableSignals   = p_(Str())
+    Signal             = p_(Str())
     
 class IAgMD2ControlIOs(DeviceParameterContainerModel):  
     childFactory = Callable(IAgMD2ControlIO)
 
 class IIviDriverOperation(DeviceParameterModel):
     Cache                 = p_(Bool())   
-    DriverSetup           = p_(Unicode())   
+    DriverSetup           = p_(Str())   
     InterchangeCheck      = p_(Bool()) 
-    IoResourceDescriptor  = p_(Unicode())
-    LogicalName           = p_(Unicode())
+    IoResourceDescriptor  = p_(Str())
+    LogicalName           = p_(Str())
     QueryInstrumentStatus = p_(Bool())
     RangeCheck            = p_(Bool())
     RecordCoercions       = p_(Bool())
@@ -281,11 +280,11 @@ class IAgMD2TriggerSources(DeviceParameterContainerModel):
 class IAgMD2TriggerOutput(DeviceParameterModel):
     Enabled = p_(Bool())
     Offset  = p_(Float())
-    Source  = p_(Unicode())
+    Source  = p_(Str())
     
 
 class IAgMD2Trigger(DeviceParameterModel):
-    ActiveSource      = p_(Unicode())
+    ActiveSource      = p_(Str())
     
     """ Delay
     Specifies the length of time from the trigger event to the first point in 

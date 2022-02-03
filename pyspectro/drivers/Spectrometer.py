@@ -1,4 +1,4 @@
-# ------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Copyright (c) 2016-2021, DSPlogic, Inc.  All Rights Reserved.  
 #
 # RESTRICTED RIGHTS
@@ -6,11 +6,10 @@
 #
 # Details of the software license agreement are in the file LICENSE.txt,
 # distributed with this software.
-# ------------------------------------------------------------------------------
-from __future__ import (division, print_function, absolute_import)
+# -----------------------------------------------------------------------------
 
 #: Package imports
-from atom.api import Atom, Int, Bool, Property, Float, Typed, Tuple, Unicode, List
+from atom.api import Atom, Int, Bool, Property, Float, Typed, Tuple, Str, List
 import numpy as np
 from .dsplogic import BUFFER_ID
 from ..common.bitreversal import bitrevorder
@@ -63,9 +62,9 @@ class SpectrometerApplication(Atom):
 
     interleaving = Bool()
 
-    required_hwcfg = Tuple(item=Unicode())
+    required_hwcfg = Tuple(item=Str())
 
-    bitfile = Unicode()
+    bitfile = Str()
 
     floating_point = Bool()
 
@@ -592,8 +591,8 @@ class MemoryConverter(Atom):
 
             #: Precompute FFT channel index for each location in memory
             #: FOR NOW, JUST USE LINEAR INDEX
-            self._ddra_indices = np.arange(nfftdiv2, dtype = np.int)
-            self._ddrb_indices = np.arange(nfftdiv2, dtype = np.int)+ Nfft//2
+            self._ddra_indices = np.arange(nfftdiv2, dtype = int)
+            self._ddrb_indices = np.arange(nfftdiv2, dtype = int)+ Nfft//2
 
             #: data to ddr is 16 wide
             for k in range(Nfft// 16 ):
@@ -643,8 +642,8 @@ class MemoryConverter(Atom):
             bitrev_indices =  bitrevorder(np.array(range(Nfft//2)))
 
             #: Precompute FFT channel index for each location in memory
-            self._ddra_indices = np.zeros(Nfft//2//2, dtype = np.int)
-            self._ddrb_indices = np.zeros(Nfft//2//2, dtype = np.int)
+            self._ddra_indices = np.zeros(Nfft//2//2, dtype = int)
+            self._ddrb_indices = np.zeros(Nfft//2//2, dtype = int)
 
             for k in range(Nfft//2//2//8):
                 self._ddra_indices[k*8 : (k+1)*8] = bitrev_indices[ 2*k   *8 + np.arange(8)]

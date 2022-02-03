@@ -1,12 +1,11 @@
 # This file enaml example code
-# ------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Copyright (c) 2013, Nucleic Development Team.
 #
 # Distributed under the terms of the Modified BSD License.
 #
 # The full license is in the file COPYING.txt, distributed with this software.
-# ------------------------------------------------------------------------------
-from __future__ import (division, print_function, absolute_import)
+# -----------------------------------------------------------------------------
 
 """ An advanced example of Enaml templates.
 
@@ -17,7 +16,7 @@ is then used to unroll a list of these controls into the body of a form.
 
 << autodoc-me >>
 """
-from atom.api import Atom, Bool, Enum, Event, Float, Int, Str, Unicode
+from atom.api import Atom, Bool, Enum, Event, Float, Int, Str
 
 from enaml.core.api import DynamicTemplate
 from enaml.stdlib.fields import FloatField
@@ -31,9 +30,9 @@ from pyspectro.common.parameters import _isParameter
 
 
 
-# ------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # "Libaray" Definitions
-# ------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # The templates and enamldefs defined in this section are ones which can
 # be written once and then used as a library. They are more-or-less fully
 # generic and will work for a large swath of models.
@@ -77,15 +76,6 @@ template FormControl(Attr, MemberType: Str):
         text << getattr(model, Attr)
         text :: setattr(model, Attr, str(text))
 
-
-template FormControl(Attr, MemberType: Unicode):
-    """ A form control template specialization for Unicode members.
-
-    This control uses a Field to represent the value.
-
-    """
-    Field:
-        text := getattr(model, Attr)
 
 
 template FormControl(Attr, MemberType: Float):
@@ -240,22 +230,22 @@ enamldef AutoForm(Form):
         args = (type(model),)
 
 
-# ------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Main Models and Views
-# ------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 class FooModel(Atom):
     spam = Int(34)
     ham = Int(42)
     first = Str('first')
     last = Str('last')
-    owner = Unicode('owner')
+    owner = Str('owner')
     time = Float(42.56)
     click = Bool()
     clack = Bool()
 
 
 class BarModel(Atom):
-    name = Unicode('name')
+    name = Str('name')
     trigger = Event()
     choices = Enum('first', 'second', 'third')
     def _observe_trigger(self, change):

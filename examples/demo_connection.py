@@ -1,4 +1,4 @@
-# ------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Copyright (c) 2016-2021, DSPlogic, Inc.  All Rights Reserved.  
 # 
 # RESTRICTED RIGHTS
@@ -6,8 +6,7 @@
 #
 # Details of the software license agreement are in the file LICENSE.txt, 
 # distributed with this software.
-# ------------------------------------------------------------------------------
-from __future__ import (division, print_function, absolute_import)
+# -----------------------------------------------------------------------------
 
 """ Instrument Connection Example (not threaded)
 
@@ -20,10 +19,12 @@ the threeaded ConnectionManager object:
 
 """
 
-from pyspectro.drivers.Spectrometer import UHSFFTS_32k
 from pyspectro.applib.instrument_props import get_instrument_properties_string
 
 import logging
+
+from pyspectro.apps import UHSFFTS_32k
+
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.DEBUG,
                     format="%(relativeCreated)5d %(name)-15s %(levelname)-8s %(message)s")

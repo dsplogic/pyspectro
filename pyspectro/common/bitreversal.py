@@ -1,4 +1,4 @@
-# ------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Copyright (c) 2016-2021, DSPlogic, Inc.  All Rights Reserved.  
 # 
 # RESTRICTED RIGHTS
@@ -10,8 +10,7 @@
 # Function bitrevorder_gen licensed according to source: 
 #   http://ryancompton.net/2014/06/05/bit-reversal-permutation-in-python/
 #
-# ------------------------------------------------------------------------------
-from __future__ import (division, print_function, absolute_import)
+# -----------------------------------------------------------------------------
 
 
 """ Bit reversal utilities

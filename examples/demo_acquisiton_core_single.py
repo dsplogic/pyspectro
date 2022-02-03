@@ -1,4 +1,4 @@
-# ------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Copyright (c) 2016-2021, DSPlogic, Inc.  All Rights Reserved.  
 # 
 # RESTRICTED RIGHTS
@@ -6,7 +6,7 @@
 #
 # Details of the software license agreement are in the file LICENSE.txt, 
 # distributed with this software.
-# ------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 """ Single acquisiton example using PySpectroCore multi-threaded application
 
@@ -16,6 +16,8 @@ to perform a single data acquisition.
 """
 
 import logging
+
+import pyspectro
 from pyspectro.applib.core import PySpectroCore
 
 
@@ -29,7 +31,7 @@ logging.basicConfig(level=logging.DEBUG,
 resourceName = 'PXI4::4-0.0::INSTR'
 
 #: Start applciation
-core = PySpectroCore()
+core = PySpectroCore(pyspectro.apps.get_application(32768, 1))
 
 #: Assign a simple function to the "on_state_change" callback.
 #: This callback allows user code to be executed on the main application loop thread
