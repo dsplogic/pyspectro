@@ -1,0 +1,30 @@
+
+PySpectro has been tested with several Python/QT versions.  Python 2.7 with QT4 is currently recommended because it has the highest performance.
+
+# Python 2.7 with QT4 
+
+## Python 2.7 with QT4
+conda create --name pyspectro_py27_qt4 python=2.7 qt=4
+conda install --name pyspectro_py27_qt4 atom enaml h5py comtypes numpy  matplotlib configparser
+conda activate pyspectro_py27_qt4
+
+#Python 2.7/QT5
+
+- Known issue: minor graphics issue in spectrum plot
+
+## Python 2.7 with QT5
+conda create --name pyspectro_py27_qt5 python=2.7 qt=5
+conda install --name pyspectro_py27_qt5 atom enaml h5py comtypes numpy  matplotlib configparser
+conda activate pyspectro_py27_qt5
+
+# Python 3.7
+
+- Known issue: slower performance
+
+## Python 3.7 Setup
+
+configparser not required.  Only for Python 2
+
+conda create --name pyspectro_py37_qt5 python=3.7 qt=5
+conda install --name pyspectro_py37_qt5 atom enaml h5py comtypes numpy  matplotlib
+conda activate pyspectro_py37_qt5

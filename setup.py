@@ -18,7 +18,7 @@ def read(fname):
 
 setup(
     name='pyspectro',
-    version='1.0.1',
+    version='1.4',
     description='DSPlogic Wideband FFT Spectrometer GUI',
     long_description=read('README.md'),
     package_data={'': ['*.enaml', 'gui/icons/*.png']},

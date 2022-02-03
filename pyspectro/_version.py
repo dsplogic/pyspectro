@@ -15,8 +15,6 @@ except:
     _buildid = '0'
     
 _major = 1
-_minor = 3
+_minor = 4
 
 __version__ = '%s.%s.%s' % (_major,_minor,_buildid)    
-
-#print __version__
