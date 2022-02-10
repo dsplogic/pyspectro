@@ -1,4 +1,4 @@
-# ------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Copyright (c) 2016-2021, DSPlogic, Inc.  All Rights Reserved.
 # 
 # RESTRICTED RIGHTS
@@ -6,7 +6,7 @@
 #
 # Details of the software license agreement are in the file LICENSE.txt, 
 # distributed with this software.
-# ------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 from enaml.layout.api import vbox, hbox, grid,  spacer, DockLayout, HSplitLayout, VSplitLayout, TabLayout, InsertItem, align
 from enaml.widgets.api import MainWindow, Container, DockArea, DockItem, PushButton, Slider, \
@@ -15,7 +15,7 @@ from enaml.widgets.api import MainWindow, Container, DockArea, DockItem, PushBut
                               ObjectCombo, CheckBox, MultilineField, \
                               IPythonConsole, MPLCanvas, ToolBar, GroupBox, ComboBox, RadioButton, SpinBox
 from enaml.stdlib.fields import IntField, FloatField
-from atom.api import Atom, ContainerList, Unicode
+from atom.api import Atom, ContainerList, Str
 
 
 from pyspectro.gui.channel_view    import ChannelDockItem, ChannelWindow

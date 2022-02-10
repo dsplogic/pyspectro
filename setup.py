@@ -1,4 +1,4 @@
-# ------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Copyright (c) 2016-2021, DSPlogic, Inc.  All Rights Reserved.  
 # 
 # RESTRICTED RIGHTS
@@ -6,7 +6,7 @@
 #
 # Details of the software license agreement are in the file LICENSE.txt, 
 # distributed with this software.
-# ------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 from __future__ import (division, print_function, absolute_import)
 
 import os
@@ -18,7 +18,7 @@ def read(fname):
 
 setup(
     name='pyspectro',
-    version='1.0.1',
+    version='1.4',
     description='DSPlogic Wideband FFT Spectrometer GUI',
     long_description=read('README.md'),
     package_data={'': ['*.enaml', 'gui/icons/*.png']},
@@ -29,5 +29,4 @@ setup(
     url='http://www.dsplogic.com',
     license='Licensed with restricted rights.  See LICENSE.txt for details',
     entry_points={'console_scripts': ['pyspectro = pyspectro.__main__:main']}
-    #ext_modules=ext_modules,
 )

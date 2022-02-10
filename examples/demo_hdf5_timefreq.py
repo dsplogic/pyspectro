@@ -1,4 +1,4 @@
-# ------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 # Copyright (c) 2016-2021, DSPlogic, Inc.  All Rights Reserved.  
 # 
 # RESTRICTED RIGHTS
@@ -6,7 +6,7 @@
 #
 # Details of the software license agreement are in the file LICENSE.txt, 
 # distributed with this software.
-# ------------------------------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 
 """ Demonstrate time/frequency plot using HDF5 acquisition format
@@ -18,9 +18,9 @@ This program demonstrates:
 
 """
 
-import os, logging
+import logging
 from pyspectro.applib.datalogger import SpectrumDataReader
-from plot_helpers import plot_raw_data, plot_waterfall
+from pyspectro.applib.plot_helpers import plot_raw_data, plot_waterfall
 
 #: Configure logging
 logger = logging.getLogger(__name__)

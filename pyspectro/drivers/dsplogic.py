@@ -1,13 +1,12 @@
-# ------------------------------------------------------------------------------
-# Copyright (c) 2016-2021, DSPlogic, Inc.  All Rights Reserved.  
-# 
+# -----------------------------------------------------------------------------
+# Copyright (c) 2016-2021, DSPlogic, Inc.  All Rights Reserved.
+#
 # RESTRICTED RIGHTS
 # Use of this software is permitted only with a software license agreement.
 #
-# Details of the software license agreement are in the file LICENSE.txt, 
+# Details of the software license agreement are in the file LICENSE.txt,
 # distributed with this software.
-# ------------------------------------------------------------------------------
-from __future__ import (division, print_function, absolute_import)
+# -----------------------------------------------------------------------------
 
 
 """ Buffer IDs
@@ -23,8 +22,4 @@ Each memory is assigned a Buffer ID.
 
 The user core FPGA code defines the following
 """
-BUFFER_ID  = {'DpuA.QDR2' : 20,
-              'DpuA.DDR3A': 28,
-              'DpuA.DDR3B': 30
-               }
-
+BUFFER_ID = {"DpuA.QDR2": 20, "DpuA.DDR3A": 28, "DpuA.DDR3B": 30}

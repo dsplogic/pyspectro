@@ -1,0 +1,63 @@
+# -----------------------------------------------------------------------------
+# Copyright (c) 2016-2021, DSPlogic, Inc.  All Rights Reserved.
+# 
+# RESTRICTED RIGHTS
+# Use of this software is permitted only with a software license agreement.
+#
+# Details of the software license agreement are in the file LICENSE.txt, 
+# distributed with this software.
+# -----------------------------------------------------------------------------
+
+from enaml.layout.api import vbox, hbox, grid,  spacer, DockLayout, HSplitLayout, VSplitLayout, TabLayout, InsertItem, align
+from enaml.widgets.api import MainWindow, Container, DockArea, DockItem, PushButton, Slider, \
+                              MenuBar, Menu, Action, \
+                              Timer, \
+                              Html, Form, Label, Field, \
+                              ObjectCombo, CheckBox, MultilineField, \
+                              IPythonConsole, MPLCanvas, ToolBar, GroupBox, ComboBox, RadioButton, SpinBox
+from enaml.stdlib.fields import IntField, FloatField
+
+
+from pyspectro.gui.channel_view    import ChannelDockItem, ChannelWindow
+from pyspectro.gui.pyspectro_model import SpectroModel
+
+from atom.api import Atom, Typed, ForwardTyped, observe
+
+
+from enaml.stdlib.message_box import MessageBox, information, question, warning
+    
+from pyspectro.gui.pyspectro_top import ConsoleView, CalibrationView
+from pyspectro.gui.inputsettings_view import InputSettingsView
+from pyspectro.gui.spectral_view import SpectralView
+from pyspectro.gui.monitor_view import MonitorView
+from pyspectro.gui.cwtest_view import CwTestView
+from pyspectro.gui.acq_control_view import AcquisitionControlView
+from pyspectro.gui.datalogger_control_view import DataLoggerControlView
+from pyspectro.gui.ps_dock_area import MainAreaController
+
+enamldef PsDockArea(DockArea): mainArea :
+
+    attr spectroModel 
+
+    attr controller 
+
+    # Subscribe to the model when the dock area initializes.
+    initialized :: 
+        #spectroModel.observe('connectionSignal', on_connectionChange)
+        
+        mainArea.controller = MainAreaController(model = mainArea.spectroModel, view = self)
+
+
+    #: Timer to control figure refresh rate
+    Timer : refresh_timer :
+        interval = 1000
+        single_shot << spectroModel.acquisitionMode == 'One-shot' 
+        timeout :: 
+            spectroModel.request_update()
+            
+
+
+
+                
+
+
