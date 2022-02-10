@@ -1,5 +1,5 @@
 # -----------------------------------------------------------------------------
-# Copyright (c) 2016-2021, DSPlogic, Inc.  All Rights Reserved.  
+# Copyright (c) 2016-2021, DSPlogic, Inc.  All Rights Reserved.
 #
 # RESTRICTED RIGHTS
 # Use of this software is permitted only with a software license agreement.
@@ -19,24 +19,24 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 from pyspectro.common.helpers import Timer
-from pyspectro.applib.processing  import convert_raw_to_fs, convert_fs_to_dbfs
+from pyspectro.applib.processing import convert_raw_to_fs, convert_fs_to_dbfs
 from pyspectro.applib.acq_control import AcquisitionControlInterface
 
 
 import logging
+
 logging.basicConfig(level=logging.DEBUG)
 
 
 logger = logging.getLogger(__name__)
 
 
-resourceName = 'PXI4::4-0.0::INSTR'
-
+resourceName = "PXI4::4-0.0::INSTR"
 
 
 def plotresult(dBspectrum, Fs):
     #: Compute frequency axis
-    f = np.arange(16384.0, dtype=np.float )
+    f = np.arange(16384.0, dtype=np.float)
     df = Fs / 2.0 / 16384.0
     f = f * df
 
@@ -52,11 +52,11 @@ def plotresult(dBspectrum, Fs):
     plt.show()
 
 
-def process_buffer(acqbuffer, complexData = False):
-    logger.debug('Processing buffer')
+def process_buffer(acqbuffer, complexData=False):
+    logger.debug("Processing buffer")
 
     with acqbuffer.lock:
-        logger.debug('Acquired buffer lock')
+        logger.debug("Acquired buffer lock")
 
         if acqbuffer.fftdata is not None:
 
@@ -67,17 +67,17 @@ def process_buffer(acqbuffer, complexData = False):
             plotresult(fft_dbfs, Fs)
 
         else:
-            logger.warning('Buffer empty')
+            logger.warning("Buffer empty")
 
-    logger.debug('Released buffer lock')
+    logger.debug("Released buffer lock")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
 
     from pyspectro.apps import UHSFFTS_32k, UHSFFTS_4k_complex
 
     #: Connect to instrument
-    #ffts = UHSFFTS_32k(resourceName)
+    # ffts = UHSFFTS_32k(resourceName)
     ffts = UHSFFTS_4k_complex(resourceName)
 
     try:
@@ -88,11 +88,11 @@ if __name__ == '__main__':
         ffts.numAverages = 1024
 
         #: Start acquisiton controller thread
-        acqControl = AcquisitionControlInterface(ffts) #:, notify = dataReadyCallback )
+        acqControl = AcquisitionControlInterface(ffts)  #:, notify = dataReadyCallback )
         try:
             acqControl.initialize()
 
-            acqControl.send_command('start')
+            acqControl.send_command("start")
 
             acqControl.dataReady.wait()
             acqControl.dataReady.clear()

@@ -11,9 +11,8 @@
 from pyspectro.apps import UHSFFTS_32k
 from pyspectro.applib.instrument_props import get_instrument_properties_string
 
-ffts = UHSFFTS_32k('PXI4::4-0.0::INSTR')
+ffts = UHSFFTS_32k("PXI4::4-0.0::INSTR")
 ffts.connect()
 result = get_instrument_properties_string(ffts)
-print result
+print(result)
 ffts.disconnect()
-
