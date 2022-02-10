@@ -15,7 +15,7 @@ from pyspectro.gui.ps_menubar      import PsMenuBar
 from pyspectro.gui.ps_toolbar      import PsToolBar
 from pyspectro.gui.ps_statusbar    import PsStatusBar
 from pyspectro.gui.acq_toolbar     import AcquisitionToolBar
-from pyspectro.gui.ps_dock_area    import PsDockArea
+from pyspectro.gui.ps_dock_area_view  import PsDockArea
 from pyspectro.gui.pyspectro_model import SpectroModel
 from pyspectro.gui.icons import dsplogicIcon
 

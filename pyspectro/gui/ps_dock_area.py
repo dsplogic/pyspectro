@@ -21,7 +21,7 @@ from enaml.stdlib.fields import IntField, FloatField
 from pyspectro.gui.channel_view    import ChannelDockItem, ChannelWindow
 from pyspectro.gui.pyspectro_model import SpectroModel
 
-from atom.api import Atom, Typed, ForwardTyped, observe
+from atom.api import Atom, Typed, ForwardTyped, observe, Value
 
 
 from enaml.stdlib.message_box import MessageBox, information, question, warning
@@ -33,11 +33,12 @@ from pyspectro.gui.monitor_view import MonitorView
 from pyspectro.gui.cwtest_view import CwTestView
 from pyspectro.gui.acq_control_view import AcquisitionControlView
 from pyspectro.gui.datalogger_control_view import DataLoggerControlView
+# from pyspectro.gui.ps_dock_area_view import PsDockArea
     
 class MainAreaController(Atom):
    
     model = Typed(SpectroModel)
-    view  = ForwardTyped(lambda: PsDockArea)
+    view  = Value() # ForwardTyped(lambda: PsDockArea)
 
 
     def initialize_layout(self):
@@ -145,26 +146,7 @@ def close_dock_layout(mainArea):
     for item in mainArea.dock_items():
         item.destroy()
                                                             
-enamldef PsDockArea(DockArea): mainArea :
 
-    attr spectroModel 
-
-    attr controller 
-
-    # Subscribe to the model when the dock area initializes.
-    initialized :: 
-        #spectroModel.observe('connectionSignal', on_connectionChange)
-        
-        mainArea.controller = MainAreaController(model = mainArea.spectroModel, view = self)
-
-
-    #: Timer to control figure refresh rate
-    Timer : refresh_timer :
-        interval = 1000
-        single_shot << spectroModel.acquisitionMode == 'One-shot' 
-        timeout :: 
-            spectroModel.request_update()
-            
 
 
 
