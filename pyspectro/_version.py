@@ -14,6 +14,6 @@ except:
     _buildid = "0"
 
 _major = 1
-_minor = 4
+_minor = 5
 
 __version__ = "%s.%s.%s" % (_major, _minor, _buildid)
