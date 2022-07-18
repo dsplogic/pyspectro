@@ -61,7 +61,7 @@ from pyspectro.gui.spectral_view import SpectralView
 from pyspectro.gui.monitor_view import MonitorView
 from pyspectro.gui.cwtest_view import CwTestView
 from pyspectro.gui.acq_control_view import AcquisitionControlView
-from pyspectro.gui.datalogger_control_view import DataLoggerControlView
+# from pyspectro.gui.datalogger_control_view import DataLoggerControlView
 
 # from pyspectro.gui.ps_dock_area_view import PsDockArea
 
@@ -105,11 +105,11 @@ def initialize_layout(mainArea):
 
     mainArea.update_layout(op)
 
-    name = "datalogger_tab"
-    title = "Data Logging"
-    item = DockItem(mainArea, name=name, title=title, closable=False)
-    DataLoggerControlView(item, model=mainArea.spectroModel)
-    op = InsertItem(item=name)
+    # name = "datalogger_tab"
+    # title = "Data Logging"
+    # item = DockItem(mainArea, name=name, title=title, closable=False)
+    # DataLoggerControlView(item, model=mainArea.spectroModel)
+    # op = InsertItem(item=name)
 
     mainArea.update_layout(op)
 
@@ -156,7 +156,8 @@ def initialize_layout(mainArea):
     layout = HSplitLayout(
         VSplitLayout(TabLayout("spectrum_1"), "Monitor"),
         VSplitLayout(
-            TabLayout("acq_tab", "cal_tab", "datalogger_tab"),
+            # TabLayout("acq_tab", "cal_tab", "datalogger_tab"),
+            TabLayout("acq_tab", "cal_tab"),
             TabLayout("input_settings", "cwtest_tab"),
         ),
     )

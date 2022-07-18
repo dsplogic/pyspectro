@@ -32,7 +32,6 @@ from pyspectro.gui.spectral_view import SpectralView
 from pyspectro.gui.monitor_view import MonitorView
 from pyspectro.gui.cwtest_view import CwTestView
 from pyspectro.gui.acq_control_view import AcquisitionControlView
-from pyspectro.gui.datalogger_control_view import DataLoggerControlView
 from pyspectro.gui.ps_dock_area import MainAreaController
 
 enamldef PsDockArea(DockArea): mainArea :
