@@ -44,7 +44,7 @@ def get_application(Nfft, channels):
             floating_point=True,
             downsample_ratio=[1, 2],
             bitfile="U5303ADPULX2FDK_n4kc_1_2_10.bit",  # 'U5303ADPULX2FDK_uhsffts_32k_float_newfdk.bit'
-            required_hwcfg=("CH2", "LX2", "F10", "DGT", "FDK", "M02", "SR1"),
+            required_hwcfg=("CH2", "LX2", "F05", "DGT", "FDK", "M02", "SR1"),
         )
 
         return app
