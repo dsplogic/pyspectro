@@ -11,8 +11,11 @@
 import logging
 import unittest
 
+import numpy as np
+
 from pyspectro.applib.acq_control import AcquisitionControlInterface
 from pyspectro.apps import UHSFFTS_32k
+from pyspectro.apps import UHSFFTS_4k_complex
 
 logger = logging.getLogger(__name__)
 logging.basicConfig(level=logging.INFO, format="%(relativeCreated)5d %(name)-15s %(levelname)-8s %(message)s")
@@ -27,14 +30,14 @@ class Test(unittest.TestCase):
 
         self.resourceName = "PXI4::4-0.0::INSTR"
 
-        self.ffts = UHSFFTS_32k(self.resourceName)
-        # self.ffts = UHSFFTS_4k_complex(self.resourceName)
+        # self.ffts = UHSFFTS_32k(self.resourceName)
+        self.ffts = UHSFFTS_4k_complex(self.resourceName)
 
         self.ffts.connect()
 
         self.ffts.instrument.Calibration.SelfCalibrate()
 
-        self.ffts.numAverages = 1024
+        self.ffts.numAverages = 8192
 
         self.acqControl = AcquisitionControlInterface(self.ffts)
 
@@ -44,14 +47,14 @@ class Test(unittest.TestCase):
         print("Fs={}".format(self.Fs))
 
         self.specFig = SpectrumFigure(
-            Nfft=32768,
+            Nfft=self.ffts.Nfft,
             sampleRate=self.ffts.sampleRate,
             complexData=self.ffts.app.complexData,
             numAverages=self.ffts.numAverages,
             voltageRange=self.ffts.instrument.Channels["Channel1"].Range,
         )
 
-        """ Test CW Generator """
+        """ Test Digital CW Generator """
         self.ffts._testMode = True
         self.ffts._testFreq = 100e6
         self.ffts.disablePolyphase = False
@@ -63,7 +66,7 @@ class Test(unittest.TestCase):
 
     def testSingle(self):
 
-        #: Start acquisiton controller thread
+        #: Start acquisition controller thread
         self.acqControl.initialize()
 
         self.acqControl.send_command("start")
@@ -89,10 +92,9 @@ class Test(unittest.TestCase):
 
         self.acqControl.dataReady.clear()
 
-    @unittest.skip("temp")
     def testContinuous(self):
         """Test continuous acquisiton with minimal data processing"""
-        #: Start acquisiton controller thread
+        #: Start acquisition controller thread
         self.acqControl.initialize()
 
         self.ffts.continuousMode = True
@@ -100,6 +102,7 @@ class Test(unittest.TestCase):
         self.acqControl.send_command("start")
 
         period = self.ffts.Nfft * 1 / self.ffts.sampleRate * self.ffts.numAverages
+        logger.info('Measurement period: {}'.format(period))
 
         if self.ffts.app.complexData:
             nWordsPerMeasurement = self.ffts.Nfft
@@ -111,17 +114,40 @@ class Test(unittest.TestCase):
 
         logger.info("Required throughput: %s bytes/sec" % bytesPerSecond)
 
-        #: Wait for N acquisitions
-        for k in range(500):
+        freq_step = self.ffts.sampleRate / self.ffts.Nfft
+        freq_init = -self.ffts.sampleRate / 2
+
+
+        #: Process 10 sequential measurements
+        for k in range(10):
+
+            # Wait for data to be ready
             self.acqControl.dataReady.wait()
 
+            # Acquire buffer lock
+            with self.acqControl.buffer.lock:
+
+                if self.acqControl.buffer.fftdata is not None:
+
+                    # Read data from buffer
+                    fftdata = self.acqControl.buffer.fftdata
+
+                    # Perform some basic processing (get max value)
+                    max_value = np.amax(fftdata)
+                    max_idx = np.argmax(fftdata)
+                    max_freq = freq_init + freq_step * max_idx
+                    logger.info("Max value: {} @ freq {} MHz".format(max_value, max_freq/1.0e6))
+
+                else:
+                    logger.warning("Buffer empty")
+
+            # Clear data ready flag
             self.acqControl.dataReady.clear()
 
         self.acqControl.send_command("stop")
         from pyspectro.common.atom_helpers import prettyMembers
 
         logger.debug(prettyMembers(self.acqControl.buffer.stats))
-
 
 if __name__ == "__main__":
     # import sys;sys.argv = ['', 'Test.testName']

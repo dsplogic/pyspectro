@@ -30,8 +30,8 @@ logging.basicConfig(level=logging.DEBUG,
 #: Instrument ID
 resourceName = 'PXI4::4-0.0::INSTR'
 
-#: Start applciation
-core = PySpectroCore(pyspectro.apps.get_application(32768, 1))
+#: Start application
+core = PySpectroCore(pyspectro.apps.get_application(4096, 2))
 
 #: Assign a simple function to the "on_state_change" callback.
 #: This callback allows user code to be executed on the main application loop thread

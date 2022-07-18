@@ -18,7 +18,7 @@ a single acquisiton.
 import logging
 from pyspectro.applib.plot_helpers import plot_raw_data
 from pyspectro.drivers.Spectrometer import MemoryConverter
-from pyspectro.apps import UHSFFTS_32k
+from pyspectro.apps import UHSFFTS_32k, UHSFFTS_4k_complex
 
 #: Configure logging
 logger = logging.getLogger(__name__)
@@ -29,7 +29,8 @@ logging.basicConfig(level=logging.DEBUG,
 resourceName = 'PXI4::4-0.0::INSTR'
 
 #: Instantiate the instrument driver
-ffts = UHSFFTS_32k(resourceName)
+# ffts = UHSFFTS_32k(resourceName)
+ffts = UHSFFTS_4k_complex(resourceName)
 
 #: Request a connection to the device
 ffts.connect()

@@ -11,14 +11,14 @@
 """ Instrument Connection Example (threaded)
 
 This example demonstrates how to performing the following tasks using
-the threeaded ConnectionManager object:
+the threaded ConnectionManager object:
 
     - Connect to the instrument
     - Read basic properties from the instrument 
     - Disconnect from the instrument
 
 The advantage of using the ConnectionManager is that it allows an application
-to proceeed while a connection is in process.
+to proceed while a connection is in process.
 
 """
 
@@ -56,7 +56,7 @@ with ffts.lock:
 #: Disconnect
 cm.disconnect()
 
-#: Wait for disconnect event (or perform other procesing)
+#: Wait for disconnect event (or perform other processing)
 logger.info('Waiting for disconnect')
 cm.disconnected.wait()
 
